@@ -8,6 +8,7 @@ args = []
 numbers = []
 
 char_numbers = ['1','2','3','4','5','6','7','8','9','0'] #list to compare the input chars with
+ok_chars = ['+','-',' ','\n','\t',''] #list to compare the input chars with
 
 temp_chars = []
 
@@ -16,6 +17,11 @@ for str in strings:
     for char in str:
         if char in char_numbers:
             temp_chars.append(char)
+        
+        elif char not in ok_chars:
+            # continue
+            print("char: " + char)
+            raise Exception("wrong input")
 
         if char == '+':
             args.append(char)
@@ -27,11 +33,8 @@ for str in strings:
             numbers.append(int(''.join(temp_chars)))
             temp_chars = []
         
-        if (char == '') or (char == ' ') or (char == '\n'):
-            continue
 
-        else: raise Exception("wrong input")
-    
+
     numbers.append(int(''.join(temp_chars)))
     temp_chars = []
 

@@ -26,6 +26,11 @@ for str in strings:
             args.append(char)
             numbers.append(int(''.join(temp_chars)))
             temp_chars = []
+        
+        if (char == '') or (char == ' ') or (char == '\n'):
+            continue
+
+        else: raise Exception("wrong input")
     
     numbers.append(int(''.join(temp_chars)))
     temp_chars = []

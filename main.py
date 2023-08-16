@@ -51,7 +51,7 @@ for i in range(len(args)):
         result -=  numbers[i+1]
 
 
-print('------------------')
-print(args)
-print(numbers)
+# print('------------------')
+# print(args)
+# print(numbers)
 print(result)

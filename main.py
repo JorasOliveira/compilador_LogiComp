@@ -11,26 +11,34 @@ ok_chars = ['+','-',' ','\n','\t',''] #list to compare the input chars with
 
 temp_chars = []
 
+check_for_numbers = True
 
 for str in strings:
     for char in str:
         if char in char_numbers:
-            if temp_chars:
+
+            if not check_for_numbers:
                 raise Exception("wrong input")
 
-            temp_chars.append(char)
+            else: 
+                temp_chars.append(char)
+                check_for_numbers = False
+                check_for_op = True
         
         elif char not in ok_chars:
             raise Exception("wrong input")
+        
 
         if char == '+':
             args.append(char)
             numbers.append(int(''.join(temp_chars)))
+            check_for_numbers = True
             temp_chars = []
 
         if char == '-':
             args.append(char)
             numbers.append(int(''.join(temp_chars)))
+            check_for_numbers = True
             temp_chars = []
         
 

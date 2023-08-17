@@ -1,5 +1,4 @@
 import sys
-import re
 
 
 strings = sys.argv[1:] #get all arguments except the first one (the file name)
@@ -16,11 +15,12 @@ temp_chars = []
 for str in strings:
     for char in str:
         if char in char_numbers:
+            if temp_chars:
+                raise Exception("wrong input")
+
             temp_chars.append(char)
         
         elif char not in ok_chars:
-            # continue
-            print("char: " + char)
             raise Exception("wrong input")
 
         if char == '+':
@@ -50,8 +50,4 @@ for i in range(len(args)):
     if args[i] == '-':
         result -=  numbers[i+1]
 
-
-# print('------------------')
-# print(args)
-# print(numbers)
 print(result)

@@ -1,68 +1,105 @@
 import sys
 
 
-strings = sys.argv[1:] #get all arguments except the first one (the file name)
+#strings = sys.argv[1:] #get all arguments except the first one (the file name)
+class Token:
+    def __init__(self, type, value):
+        self.type = type  #str
+        self.value = value #int
 
-args = []
-numbers = []
 
-char_numbers = ['1','2','3','4','5','6','7','8','9','0'] #list to compare the input chars with
-ok_chars = ['\n','\t','', ' '] #list to compare the input chars with
-operators = ['+','-']
+class Tokenizer:
+    def __init__(self, source, position):
+        self.source = source #str
+        self.position = position #int
+        self.next = Token("none", 0) #token
+    
 
-temp_chars = []
-last_char = strings[0][0]
+    #refazer pois esta uma caca
+    def select_next(self):
+        if self.position < len(self.source):
+            next_token = self.source[self.position]
 
-check_for_numbers = True
-check_for_stupid_annoying_case = False
+            while next_token in [' ', '\n', '\t']:
+                self.position += 1
+                if self.position < len(self.source):
+                    next_token = self.source[self.position]
+                else:
+                    break
 
-for str in strings:
-    for char in str:
-        if char in char_numbers:
-            if check_for_stupid_annoying_case:
+            if next_token.isdigit():
+                end_index = self.position
+                while end_index < len(self.source) and self.source[end_index].isdigit():
+                    end_index += 1
+
+                number_str = self.source[self.position:end_index]
+                self.next = Token('number', int(number_str))
+                self.position = end_index
+
+            elif next_token in ['+', '-']:
+                self.next = Token('operator', next_token)
+                self.position += 1
+
+            else:
+                raise Exception("Invalid character: " + next_token)
+        else:
+            self.next = None  # No more tokens
+
+class Parser:
+    def run(code):
+        tokenizer = Tokenizer(code, 0)
+        tokenizer.select_next()
+
+        return Parser.parse_expression(tokenizer)
+
+    def parse_expression(tokenizer):
+        result = 0
+
+        if tokenizer.next.type == 'number':
+
+            result = tokenizer.next.value
+            tokenizer.select_next()
+            next_token = tokenizer.next.value
+
+            if next_token in ['+', '-']:
+
+                while next_token in ['+', '-']:
+
+                    if tokenizer.next.value == '+':
+                        tokenizer.select_next()
+                        next_token = tokenizer.next
+
+                        if next_token.type == 'number':
+                            result += next_token.value
+
+                        else: raise Exception("wrong input")
+
+                    elif tokenizer.next.value == '-':
+                        tokenizer.select_next()
+                        next_token = tokenizer.next
+
+                        if next_token.type == 'number':
+                            result -= next_token.value
+
+                        else: raise Exception("wrong input")
+
+                    tokenizer.select_next()
+                    # tokenizer.select_next()
+
+
+                    if tokenizer.next is not None: 
+                        next_token = tokenizer.next.value
+            else: 
                 raise Exception("wrong input")
 
+            return result
+        else: raise Exception("wrong input")
+    
 
-            if last_char in char_numbers or last_char in operators or check_for_numbers:
-                temp_chars.append(char)
-
-        elif (char not in ok_chars) and (char not in operators):
-            raise Exception("wrong input")
-        
-
-        if last_char in char_numbers and (char in ok_chars):
-            check_for_stupid_annoying_case = True
-            
-        if char == '+':
-            args.append(char)
-            numbers.append(int(''.join(temp_chars)))
-            check_for_numbers = True
-            check_for_stupid_annoying_case = False
-            temp_chars = []
-
-        if char == '-':
-            args.append(char)
-            numbers.append(int(''.join(temp_chars)))
-            check_for_numbers = True
-            check_for_stupid_annoying_case = False
-            temp_chars = []
-        
-        last_char = char
+    
+def main():
+    print(Parser.run(sys.argv[1]))
 
 
-    numbers.append(int(''.join(temp_chars)))
-    temp_chars = []
-
-
-result = 0
-for i in range(len(args)):
-    if i == 0:
-        result = numbers[i]
-
-    if args[i] == '+':
-        result += numbers[i+1]
-
-    if args[i] == '-':
-        result -=  numbers[i+1]
-
-print(result)
+if __name__ == '__main__':
+    main()

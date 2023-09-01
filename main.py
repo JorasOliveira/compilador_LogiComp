@@ -1,12 +1,9 @@
 import sys
 
-
-#strings = sys.argv[1:] #get all arguments except the first one (the file name)
 class Token:
     def __init__(self, type, value):
         self.type = type  #str
         self.value = value #int
-
 
 class Tokenizer:
     def __init__(self, source, position):
@@ -17,18 +14,16 @@ class Tokenizer:
 
     #refazer pois esta uma caca
     def select_next(self):
+
         if self.position < len(self.source):
-            next_token = self.source[self.position]
 
-            while next_token in [' ', '\n', '\t']:
+            while self.source[self.position] in [' ', '\n', '\t']:
                 self.position += 1
-                if self.position < len(self.source):
-                    next_token = self.source[self.position]
-                else:
-                    break
 
-            if next_token.isdigit():
+            if self.source[self.position].isdigit() and self.next.type != 'number':
+
                 end_index = self.position
+
                 while end_index < len(self.source) and self.source[end_index].isdigit():
                     end_index += 1
 
@@ -36,66 +31,72 @@ class Tokenizer:
                 self.next = Token('number', int(number_str))
                 self.position = end_index
 
-            elif next_token in ['+', '-']:
-                self.next = Token('operator', next_token)
+            elif self.source[self.position] in  ['+', '-', '*', '/']:
+
+                self.next = Token('operator', self.source[self.position])
                 self.position += 1
 
             else:
-                raise Exception("Invalid character: " + next_token)
+                raise Exception("Invalid character: " + self.source[self.position])
+
         else:
             self.next = None  # No more tokens
 
 class Parser:
+    def parse_term(tokenizer):
+        result = 0
+
+        if tokenizer.next.type == 'number':
+            result = tokenizer.next.value
+            tokenizer.select_next()
+
+            if tokenizer.next == None: 
+                return result
+
+            while tokenizer.next != None and tokenizer.next.value in ['*', '/']:
+                
+                if tokenizer.next.value == '*':
+                    tokenizer.select_next()
+
+                    if tokenizer.next.type == 'number':
+                        result *= tokenizer.next.value
+                        
+                    else: raise Exception("wrong input 1")
+
+                elif tokenizer.next.value == '/':
+                    tokenizer.select_next()
+
+                    if tokenizer.next.type == 'number':
+                        result //= tokenizer.next.value
+
+                    else: raise Exception("wrong input 2")
+
+                tokenizer.select_next()
+
+            return result
+
+        else: raise Exception("wrong input 4")
+
+    def parse_expression(tokenizer):
+        result = Parser.parse_term(tokenizer)
+
+        while tokenizer.next != None and tokenizer.next.value in ['+', '-']: 
+
+            if tokenizer.next.value == '+' and tokenizer.next != None:
+                tokenizer.select_next()
+                result += Parser.parse_term(tokenizer)
+
+            elif tokenizer.next.value== '-' and tokenizer.next != None:
+                tokenizer.select_next()
+                result -= Parser.parse_term(tokenizer)
+
+        return result   
+
     def run(code):
         tokenizer = Tokenizer(code, 0)
         tokenizer.select_next()
 
         return Parser.parse_expression(tokenizer)
-
-    def parse_expression(tokenizer):
-        result = 0
-
-        if tokenizer.next.type == 'number':
-
-            result = tokenizer.next.value
-            tokenizer.select_next()
-            next_token = tokenizer.next.value
-
-            if next_token in ['+', '-']:
-
-                while next_token in ['+', '-']:
-
-                    if tokenizer.next.value == '+':
-                        tokenizer.select_next()
-                        next_token = tokenizer.next
-
-                        if next_token.type == 'number':
-                            result += next_token.value
-
-                        else: raise Exception("wrong input")
-
-                    elif tokenizer.next.value == '-':
-                        tokenizer.select_next()
-                        next_token = tokenizer.next
-
-                        if next_token.type == 'number':
-                            result -= next_token.value
-
-                        else: raise Exception("wrong input")
-
-                    tokenizer.select_next()
-                    # tokenizer.select_next()
-
-
-                    if tokenizer.next is not None: 
-                        next_token = tokenizer.next.value
-            else: 
-                raise Exception("wrong input")
-
-            return result
-        else: raise Exception("wrong input")
-    
-
     
 def main():
     print(Parser.run(sys.argv[1]))
@@ -103,3 +104,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
+

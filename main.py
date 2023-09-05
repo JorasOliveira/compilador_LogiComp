@@ -36,46 +36,82 @@ class Tokenizer:
                 self.next = Token('operator', self.source[self.position])
                 self.position += 1
 
-            else:
-                raise Exception("Invalid character: " + self.source[self.position])
+            elif self.source[self.position] == '(':
 
-        else:
-            self.next = None  # No more tokens
+                self.next = Token('open_par', self.source[self.position])
+                self.position += 1
+
+            elif self.source[self.position] == ')':
+
+                self.next = Token('close_par', self.source[self.position])
+                self.position += 1
+
+            else: raise Exception("Invalid character: " + self.source[self.position])
+
+        else: self.next = None  # No more tokens
 
 class Parser:
-    def parse_term(tokenizer):
+
+    def parse_factor(tokenizer):
         result = 0
+        
+        if tokenizer.next.value == '+':
+            tokenizer.select_next()
+            return Parser.parse_factor(tokenizer)
+
+        elif tokenizer.next.value == '-':
+            tokenizer.select_next()
+            return (-1) * Parser.parse_factor(tokenizer)
+
+        elif tokenizer.next != None and tokenizer.next.value == '(':
+            
+            tokenizer.select_next()
+            result = Parser.parse_expression(tokenizer)
+
+            if tokenizer.next != None and tokenizer.next.value == ')':
+                tokenizer.select_next()
+                return result 
+
+            else: raise Exception("wrong input 3")
+
 
         if tokenizer.next.type == 'number':
             result = tokenizer.next.value
             tokenizer.select_next()
-
-            if tokenizer.next == None: 
-                return result
-
-            while tokenizer.next != None and tokenizer.next.value in ['*', '/']:
-                
-                if tokenizer.next.value == '*':
-                    tokenizer.select_next()
-
-                    if tokenizer.next.type == 'number':
-                        result *= tokenizer.next.value
-                        
-                    else: raise Exception("wrong input 1")
-
-                elif tokenizer.next.value == '/':
-                    tokenizer.select_next()
-
-                    if tokenizer.next.type == 'number':
-                        result //= tokenizer.next.value
-
-                    else: raise Exception("wrong input 2")
-
-                tokenizer.select_next()
-
             return result
 
+            if tokenizer.next == None: 
+                raise Exception("wrong input 5")
+
         else: raise Exception("wrong input 4")
+
+    def parse_term(tokenizer):
+        result = Parser.parse_factor(tokenizer)
+
+        while tokenizer.next != None and tokenizer.next.value in ['*', '/']:
+            
+            if tokenizer.next.value == '*':
+                tokenizer.select_next()
+                
+                result *= Parser.parse_factor(tokenizer)
+                # if tokenizer.next.type == 'number':
+                #     result *= tokenizer.next.value
+                    
+                # else: raise Exception("wrong input 1")
+
+            elif tokenizer.next.value == '/':
+                tokenizer.select_next()
+
+                result //= Parser.parse_factor(tokenizer)
+
+                # if tokenizer.next.type == 'number':
+                #     result //= tokenizer.next.value
+
+                # else: raise Exception("wrong input 2")
+
+            tokenizer.select_next()
+
+        return result
 
     def parse_expression(tokenizer):
         result = Parser.parse_term(tokenizer)
@@ -86,11 +122,13 @@ class Parser:
                 tokenizer.select_next()
                 result += Parser.parse_term(tokenizer)
 
-            elif tokenizer.next.value== '-' and tokenizer.next != None:
+            elif tokenizer.next.value == '-' and tokenizer.next != None:
                 tokenizer.select_next()
                 result -= Parser.parse_term(tokenizer)
 
         return result   
+
+    
 
     def run(code):
         tokenizer = Tokenizer(code, 0)

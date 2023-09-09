@@ -48,45 +48,54 @@ class Tokenizer:
 
             else: raise Exception("Invalid character: " + self.source[self.position])
 
-        else: self.next = None  # No more tokens
-
 class Parser:
 
     def parse_factor(tokenizer):
         result = 0
+
+        print("parse factor, next: ", tokenizer.next.value)
         
         if tokenizer.next.value == '+':
             tokenizer.select_next()
+            print("+")
             return Parser.parse_factor(tokenizer)
 
-        elif tokenizer.next.value == '-':
+        if tokenizer.next.value == '-':
             tokenizer.select_next()
+            print("-")
             return (-1) * Parser.parse_factor(tokenizer)
 
-        elif tokenizer.next != None and tokenizer.next.value == '(':
+        if tokenizer.next.value == ')':
+            raise Exception("wrong input 4")
+
+        if tokenizer.next.value == '(':
+            print("(")
             
             tokenizer.select_next()
             result = Parser.parse_expression(tokenizer)
 
-            if tokenizer.next != None and tokenizer.next.value == ')':
+            if tokenizer.next.value == ')':
+                print(")")
                 tokenizer.select_next()
                 return result 
 
             else: raise Exception("wrong input 3")
-
 
         if tokenizer.next.type == 'number':
             result = tokenizer.next.value
             tokenizer.select_next()
             return result
 
-            if tokenizer.next == None: 
-                raise Exception("wrong input 5")
-
-        else: raise Exception("wrong input 4")
+        else: raise Exception("wrong input 5")
 
     def parse_term(tokenizer):
         result = Parser.parse_factor(tokenizer)
+        print("result at parse_term: ", result)
+        print("next value at parse_term: ", tokenizer.next.value)
+
+
+        # if tokenizer.next.value == ')':
+        #     raise Exception("wrong input")
 
         while tokenizer.next != None and tokenizer.next.value in ['*', '/']:
             
@@ -94,41 +103,31 @@ class Parser:
                 tokenizer.select_next()
                 
                 result *= Parser.parse_factor(tokenizer)
-                # if tokenizer.next.type == 'number':
-                #     result *= tokenizer.next.value
-                    
-                # else: raise Exception("wrong input 1")
-
+ 
             elif tokenizer.next.value == '/':
                 tokenizer.select_next()
 
                 result //= Parser.parse_factor(tokenizer)
-
-                # if tokenizer.next.type == 'number':
-                #     result //= tokenizer.next.value
-
-                # else: raise Exception("wrong input 2")
-
-            tokenizer.select_next()
 
         return result
 
     def parse_expression(tokenizer):
         result = Parser.parse_term(tokenizer)
 
+        print("result at parse_expression: ", result)
+        print("next value at parse_expression: ", tokenizer.next.value)
+
         while tokenizer.next != None and tokenizer.next.value in ['+', '-']: 
 
-            if tokenizer.next.value == '+' and tokenizer.next != None:
+            if tokenizer.next.value == '+':
                 tokenizer.select_next()
                 result += Parser.parse_term(tokenizer)
 
-            elif tokenizer.next.value == '-' and tokenizer.next != None:
+            elif tokenizer.next.value == '-':
                 tokenizer.select_next()
                 result -= Parser.parse_term(tokenizer)
 
         return result   
-
-    
 
     def run(code):
         tokenizer = Tokenizer(code, 0)

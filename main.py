@@ -52,8 +52,6 @@ class Parser:
 
     def parse_factor(tokenizer):
         result = 0
-
-        print("parse factor, next: ", tokenizer.next.value)
         
         if tokenizer.next.value == '+':
             tokenizer.select_next()
@@ -90,8 +88,8 @@ class Parser:
 
     def parse_term(tokenizer):
         result = Parser.parse_factor(tokenizer)
-        print("result at parse_term: ", result)
-        print("next value at parse_term: ", tokenizer.next.value)
+        # print("result at parse_term: ", result)
+        # print("next value at parse_term: ", tokenizer.next.value)
 
 
         # if tokenizer.next.value == ')':
@@ -114,8 +112,8 @@ class Parser:
     def parse_expression(tokenizer):
         result = Parser.parse_term(tokenizer)
 
-        print("result at parse_expression: ", result)
-        print("next value at parse_expression: ", tokenizer.next.value)
+        # print("result at parse_expression: ", result)
+        # print("next value at parse_expression: ", tokenizer.next.value)
 
         while tokenizer.next != None and tokenizer.next.value in ['+', '-']: 
 

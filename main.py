@@ -10,11 +10,9 @@ class Tokenizer:
         self.source = source #str
         self.position = position #int
         self.next = Token("none", 0) #token
-    
+        self.open_parentheses_count = 0  # Keep track of open parentheses
 
-    #refazer pois esta uma caca
     def select_next(self):
-
         if self.position < len(self.source):
 
             while self.source[self.position] in [' ', '\n', '\t']:
@@ -23,7 +21,6 @@ class Tokenizer:
             if self.source[self.position].isdigit() and self.next.type != 'number':
 
                 end_index = self.position
-
                 while end_index < len(self.source) and self.source[end_index].isdigit():
                     end_index += 1
 
@@ -31,22 +28,26 @@ class Tokenizer:
                 self.next = Token('number', int(number_str))
                 self.position = end_index
 
-            elif self.source[self.position] in  ['+', '-', '*', '/']:
-
+            elif self.source[self.position] in ['+', '-', '*', '/']:
                 self.next = Token('operator', self.source[self.position])
                 self.position += 1
 
             elif self.source[self.position] == '(':
-
+                self.open_parentheses_count += 1  # Increment open parentheses count
                 self.next = Token('open_par', self.source[self.position])
                 self.position += 1
 
             elif self.source[self.position] == ')':
 
+                if self.open_parentheses_count <= 0:
+                    raise Exception("Unbalanced parentheses: ')' without '('")
+
+                self.open_parentheses_count -= 1  # Decrement open parentheses count
                 self.next = Token('close_par', self.source[self.position])
                 self.position += 1
 
-            else: raise Exception("Invalid character: " + self.source[self.position])
+            else:
+                raise Exception("Invalid character: " + self.source[self.position])
 
 class Parser:
 
@@ -55,45 +56,31 @@ class Parser:
         
         if tokenizer.next.value == '+':
             tokenizer.select_next()
-            # print("+")
             return Parser.parse_factor(tokenizer)
 
         if tokenizer.next.value == '-':
             tokenizer.select_next()
-            # print("-")
-            return (-1) * Parser.parse_factor(tokenizer)
-
-        if tokenizer.next.value == ')':
-            raise Exception("wrong input 4")
+            return -Parser.parse_factor(tokenizer)
 
         if tokenizer.next.value == '(':
-            # print("(")
-            
             tokenizer.select_next()
             result = Parser.parse_expression(tokenizer)
 
             if tokenizer.next.value == ')':
-                # print(")")
                 tokenizer.select_next()
-                return result 
+                return result
 
-            else: raise Exception("wrong input 3")
-
+            raise Exception("Unbalanced parentheses: '(' without ')'")
+        
         if tokenizer.next.type == 'number':
             result = tokenizer.next.value
             tokenizer.select_next()
             return result
 
-        else: raise Exception("wrong input 5")
+        raise Exception("Invalid input")
 
     def parse_term(tokenizer):
         result = Parser.parse_factor(tokenizer)
-        # print("result at parse_term: ", result)
-        # print("next value at parse_term: ", tokenizer.next.value)
-
-
-        # if tokenizer.next.value == ')':
-        #     raise Exception("wrong input")
 
         while tokenizer.next != None and tokenizer.next.value in ['*', '/']:
             
@@ -112,9 +99,6 @@ class Parser:
     def parse_expression(tokenizer):
         result = Parser.parse_term(tokenizer)
 
-        # print("result at parse_expression: ", result)
-        # print("next value at parse_expression: ", tokenizer.next.value)
-
         while tokenizer.next != None and tokenizer.next.value in ['+', '-']: 
 
             if tokenizer.next.value == '+':
@@ -131,6 +115,7 @@ class Parser:
         tokenizer = Tokenizer(code, 0)
         tokenizer.select_next()
 
+        # print(tokenizer.open_parentheses_count)
         return Parser.parse_expression(tokenizer)
     
 def main():

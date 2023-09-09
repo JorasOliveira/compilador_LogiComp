@@ -55,25 +55,25 @@ class Parser:
         
         if tokenizer.next.value == '+':
             tokenizer.select_next()
-            print("+")
+            # print("+")
             return Parser.parse_factor(tokenizer)
 
         if tokenizer.next.value == '-':
             tokenizer.select_next()
-            print("-")
+            # print("-")
             return (-1) * Parser.parse_factor(tokenizer)
 
         if tokenizer.next.value == ')':
             raise Exception("wrong input 4")
 
         if tokenizer.next.value == '(':
-            print("(")
+            # print("(")
             
             tokenizer.select_next()
             result = Parser.parse_expression(tokenizer)
 
             if tokenizer.next.value == ')':
-                print(")")
+                # print(")")
                 tokenizer.select_next()
                 return result 
 

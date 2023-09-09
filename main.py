@@ -86,12 +86,10 @@ class Parser:
             
             if tokenizer.next.value == '*':
                 tokenizer.select_next()
-                
                 result *= Parser.parse_factor(tokenizer)
  
             elif tokenizer.next.value == '/':
                 tokenizer.select_next()
-
                 result //= Parser.parse_factor(tokenizer)
 
         return result
@@ -109,14 +107,21 @@ class Parser:
                 tokenizer.select_next()
                 result -= Parser.parse_term(tokenizer)
 
+
+
+
         return result   
 
     def run(code):
         tokenizer = Tokenizer(code, 0)
         tokenizer.select_next()
 
-        # print(tokenizer.open_parentheses_count)
-        return Parser.parse_expression(tokenizer)
+        result = Parser.parse_expression(tokenizer)
+
+        if tokenizer.open_parentheses_count != 0:
+            raise Exception("incorrect number of parentheses")
+
+        return result
     
 def main():
     print(Parser.run(sys.argv[1]))

@@ -1,5 +1,4 @@
 import Token
-
 class Tokenizer:
     def __init__(self, source, position):
         self.source = source  # str

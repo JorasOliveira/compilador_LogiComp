@@ -17,10 +17,9 @@ class IntVal(Node):
 
 class BinOp(Node):
     def __init__(self, value, children):
-        super().__init__(value, [])
+        super().__init__(value, children)
 
     def evaluate(self):
-
         if self.value == "+":
             return self.children[0].evaluate() + self.children[1].evaluate()
         if self.value == "-":
@@ -33,12 +32,12 @@ class BinOp(Node):
 
 class UnOp(Node):
     def __init__(self, value, children):
-        super().__init__(value, [])
+        super().__init__(value, children)
 
     def evaluate(self):
-
         if self.value == "+":
             return self.children[0].evaluate()
+
         if self.value == "-":
             return -self.children[0].evaluate()
 

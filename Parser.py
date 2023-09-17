@@ -13,18 +13,19 @@ class Parser:
             Parser.unit_op_node = Nodes.UnOp("+", [])
             unit_op_node.children.append(Parser.parse_factor(tokenizer))
 
-            return un_op_node
+            return unit_op_node
 
         if tokenizer.next.value == "-":
             tokenizer.select_next()
 
             unit_op_node = Nodes.UnOp("-", [])
             unit_op_node.children.append(Parser.parse_factor(tokenizer))
-            return un_op_node
+            return unit_op_node
 
         if tokenizer.next.value == "(":
             tokenizer.select_next()
             result = Parser.parse_expression(tokenizer)
+
 
             if tokenizer.next.value == ")":
                 tokenizer.select_next()
@@ -38,9 +39,7 @@ class Parser:
             number_node = Nodes.IntVal(result)
 
             tokenizer.select_next()
-            return (
-                number_node
-            ) 
+            return number_node
 
         raise Exception("Invalid input")
 
@@ -48,24 +47,19 @@ class Parser:
         result = Parser.parse_factor(tokenizer)
 
         while tokenizer.next != None and tokenizer.next.value in ["*", "/"]:
-
             if tokenizer.next.value == "*":
                 tokenizer.select_next()
                 bin_op = Nodes.BinOp("*", [])
                 bin_op.children.append(result)
                 bin_op.children.append(Parser.parse_factor(tokenizer))
                 return bin_op
-                # result *= Parser.parse_factor(tokenizer)
 
             elif tokenizer.next.value == "/":
                 tokenizer.select_next()
-                bin_op = Nodes.BinOp("*", [])
+                bin_op = Nodes.BinOp("/", [])
                 bin_op.children.append(result)
                 bin_op.children.append(Parser.parse_factor(tokenizer))
                 return bin_op
-
-                # tokenizer.select_next()
-                # result //= Parser.parse_factor(tokenizer)
 
         return result
 
@@ -79,7 +73,6 @@ class Parser:
                 bin_op.children.append(result)
                 bin_op.children.append(Parser.parse_term(tokenizer))
                 return bin_op
-                # result += Parser.parse_term(tokenizer)
 
             elif tokenizer.next.value == "-":
                 tokenizer.select_next()
@@ -87,7 +80,6 @@ class Parser:
                 bin_op.children.append(result)
                 bin_op.children.append(Parser.parse_term(tokenizer))
                 return bin_op
-                # result -= Parser.parse_term(tokenizer)
 
         return result
 

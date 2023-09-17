@@ -41,7 +41,7 @@ class Parser:
             tokenizer.select_next()
             return number_node
 
-        raise Exception("Invalid input")
+        # raise Exception("Invalid input")
 
     def parse_term(tokenizer):
         result = Parser.parse_factor(tokenizer)

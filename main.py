@@ -1,11 +1,13 @@
 import sys
 from Parser import Parser
 from comment_filter import comment_filter
+from file_reader import read_file_content
 
 
 
 def main():
-    code = comment_filter(sys.argv[1])
+    code = read_file_content(sys.argv[1])
+    code = comment_filter(code)
     print(Parser.run(code).evaluate())
 
 

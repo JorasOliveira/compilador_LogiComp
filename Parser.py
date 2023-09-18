@@ -15,7 +15,7 @@ class Parser:
                 unit_op = Nodes.UnOp("-", [])
 
             tokenizer.select_next()
-            print("current token, parse_factor:", unit_op.value)
+            # print("current token, parse_factor:", unit_op.value)
             unit_op.children.append(Parser.parse_factor(tokenizer))
             return unit_op
 
@@ -34,7 +34,7 @@ class Parser:
             result = tokenizer.next.value
 
             number_node = Nodes.IntVal(result)
-            print("current token, parse_factor:", number_node.value)
+            # print("current token, parse_factor:", number_node.value)
             
             tokenizer.select_next()
             return number_node
@@ -70,7 +70,7 @@ class Parser:
         #         bin_op = Nodes.BinOp("/", [])
 
         #     tokenizer.select_next()
-        #     print("current token, parse_term:", bin_op.value)
+        #     # print("current token, parse_term:", bin_op.value)
         #     bin_op.children.append(result)
         #     bin_op.children.append(Parser.parse_factor(tokenizer))
         #     return bin_op
@@ -88,12 +88,12 @@ class Parser:
     #             bin_op = Nodes.BinOp("-", [])
 
     #         tokenizer.select_next()
-    #         print("current token, parse_expression:", bin_op.value)
+    #         # print("current token, parse_expression:", bin_op.value)
     #         bin_op.children.append(result)
     #         bin_op.children.append(Parser.parse_term(tokenizer))
     #         return bin_op
 
-    #     print("current result:", result.value)
+    #     # print("current result:", result.value)
     #     return result
 
     def run(code):

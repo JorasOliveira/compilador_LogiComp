@@ -9,7 +9,6 @@ class Tokenizer:
     def select_next(self):
         if self.position < len(self.source) - 1:
             while self.source[self.position] in [" ", "\n", "\t"]:
-                print("space reached")
                 self.position += 1
 
             if self.source[self.position] in ["+", "-", "*", "/"]:

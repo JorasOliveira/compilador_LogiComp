@@ -49,6 +49,8 @@ class Parser:
             tokenizer.select_next()
             right_operand = Parser.parse_factor(tokenizer)
             result = Nodes.BinOp(operator, [result, right_operand])
+            # return result
+
         return result
 
     def parse_expression(tokenizer):
@@ -58,7 +60,25 @@ class Parser:
             tokenizer.select_next()
             right_operand = Parser.parse_term(tokenizer)
             result = Nodes.BinOp(operator, [result, right_operand])
+            # return result
+
         return result
+    
+    def run(code):
+        tokenizer = Tokenizer.Tokenizer(code, 0)
+        tokenizer.select_next()
+
+        result = Parser.parse_expression(tokenizer)
+
+        if tokenizer.open_parentheses_count != 0:
+            raise Exception("incorrect number of parentheses")
+
+        return result
+    
+
+
+
+        
     # def parse_term(tokenizer):
         # result = Parser.parse_factor(tokenizer)
 
@@ -96,13 +116,3 @@ class Parser:
     #     # print("current result:", result.value)
     #     return result
 
-    def run(code):
-        tokenizer = Tokenizer.Tokenizer(code, 0)
-        tokenizer.select_next()
-
-        result = Parser.parse_expression(tokenizer)
-
-        if tokenizer.open_parentheses_count != 0:
-            raise Exception("incorrect number of parentheses")
-
-        return result

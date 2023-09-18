@@ -7,7 +7,7 @@ class Tokenizer:
         self.open_parentheses_count = 0  # Keep track of open parentheses
 
     def select_next(self):
-        if self.position < len(self.source) - 1:
+        if self.position < len(self.source) - 2:
             while self.source[self.position] in [" ", "\n", "\t"]:
                 self.position += 1
 

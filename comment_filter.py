@@ -10,6 +10,4 @@ def comment_filter(input_string):
     
     # Join the modified lines to create the result string
     result_string = input_string[:comment_index]
-    print(result_string)
-    
     return result_string

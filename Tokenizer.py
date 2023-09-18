@@ -7,8 +7,8 @@ class Tokenizer:
         self.open_parentheses_count = 0  # Keep track of open parentheses
 
     def select_next(self):
-        if self.position < len(self.source) - 2:
-            while self.source[self.position] in [" ", "\n", "\t"] and self.position < len(self.source) - 2:
+        if self.position < len(self.source):
+            while self.source[self.position] in [" ", "\n", "\t"] and self.position < len(self.source) -1:
                 self.position += 1
 
             if self.source[self.position] in ["+", "-", "*", "/"]:
@@ -36,6 +36,10 @@ class Tokenizer:
                 self.open_parentheses_count -= 1  # Decrement open parentheses count
                 self.next = Token.Token("close_par", self.source[self.position])
                 self.position += 1
+
+            elif self.position >= len(self.source) -1:
+                if self.source[self.position] in [" ", "\n", "\t"]:
+                    self.next = Token.Token("none", 0)
 
             else:
                 raise Exception("Invalid character: " + self.source[self.position])

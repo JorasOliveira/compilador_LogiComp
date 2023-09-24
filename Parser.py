@@ -38,11 +38,12 @@ class Parser:
                 # print(isinstance(tokenizer.next.value, int))
                 if isinstance(tokenizer.next.value, int):                
                     # print("result at Token3: ", expression)
-                    raise Exception("incorrect sintax")
+                    expression = tokenizer.next.value
                 else: 
                     expression = Parser.parse_statement(tokenizer)
                     
                 tokenizer.select_next()
+
                 if tokenizer.next.type == "close_par":
                     tokenizer.select_next()
                     result = Nodes.Print("Println", [expression])

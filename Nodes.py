@@ -27,8 +27,11 @@ class Print(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+        
+        if isinstance(self.children[0], int):
+            result = self.children[0]
 
-        result = self.children[0].evaluate(symbol_table)
+        else: result = self.children[0].evaluate(symbol_table)
 
         print(result)
         return result

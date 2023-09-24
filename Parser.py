@@ -1,8 +1,56 @@
 import Tokenizer
 import Nodes
 
-
 class Parser:
+
+    def parse_statement(tokenizer):
+        # # print("token Type: ", tokenizer.next.type)
+        if tokenizer.next.type == "newline":
+            tokenizer.select_next()
+            no_op = Nodes.NoOp()
+            return no_op
+        
+        elif tokenizer.next.type == "identifier":
+            identifier = Nodes.Identifier(tokenizer.next.value)
+            tokenizer.select_next()
+            # print("token Type 2: ", tokenizer.next.value)
+
+            if tokenizer.next.value == "=":
+                tokenizer.select_next()
+                symbol = Parser.parse_expression(tokenizer)
+                # print("symbol to be added: ", symbol, "for token: ", tokenizer.next.value)
+
+                result = Nodes.Assignment(identifier, [identifier.value, symbol])
+                return result
+            
+            return identifier
+        
+        elif tokenizer.next.type == "println":
+            tokenizer.select_next()
+
+            if tokenizer.next.type == "open_par":
+                tokenizer.select_next()
+                # print("token Type 3: ", tokenizer.next.value)
+                expression = Parser.parse_expression(tokenizer)
+                # print("result at Token3: ", expression)
+                
+            if tokenizer.next.type == "close_par":
+                tokenizer.select_next()
+                result = Nodes.print("Println", [expression])
+                return result
+        
+    def parse_block(tokenizer):
+        result = Nodes.Block("Block",[])
+        
+        while tokenizer.next.type != "none":
+            thing = Parser.parse_statement(tokenizer)
+
+            if thing:
+                result.children.append(thing)
+                # print("appending: ", thing.value)
+            tokenizer.select_next()
+        return result
+
     def parse_factor(tokenizer):
         result = 0
 
@@ -15,7 +63,6 @@ class Parser:
                 unit_op = Nodes.UnOp("-", [])
 
             tokenizer.select_next()
-            # print("current token, parse_factor:", unit_op.value)
             unit_op.children.append(Parser.parse_factor(tokenizer))
             return unit_op
 
@@ -34,13 +81,8 @@ class Parser:
             result = tokenizer.next.value
 
             number_node = Nodes.IntVal(result)
-            # print("current token, parse_factor:", number_node.value)
-            
             tokenizer.select_next()
             return number_node
-
-        raise Exception("Invalid input")
-
 
     def parse_term(tokenizer):
         result = Parser.parse_factor(tokenizer)
@@ -65,52 +107,11 @@ class Parser:
     def run(code):
         tokenizer = Tokenizer.Tokenizer(code, 0)
         tokenizer.select_next()
-
-        result = Parser.parse_expression(tokenizer)
+        
+        result = Parser.parse_block(tokenizer)
 
         if tokenizer.open_parentheses_count != 0:
             raise Exception("incorrect number of parentheses")
 
         return result
     
-
-
-
-        
-    # def parse_term(tokenizer):
-        # result = Parser.parse_factor(tokenizer)
-
-        # while tokenizer.next != None and tokenizer.next.value in ["*", "/"]:
-        #     if tokenizer.next.value == "*":
-        #         bin_op = Nodes.BinOp("*", [])
-
-        #     elif tokenizer.next.value == "/":
-        #         bin_op = Nodes.BinOp("/", [])
-
-        #     tokenizer.select_next()
-        #     # print("current token, parse_term:", bin_op.value)
-        #     bin_op.children.append(result)
-        #     bin_op.children.append(Parser.parse_factor(tokenizer))
-        #     return bin_op
-
-        # return result
-
-    # def parse_expression(tokenizer):
-    #     result = Parser.parse_term(tokenizer)
-
-    #     while tokenizer.next != None and tokenizer.next.value in ["+", "-"]:
-    #         if tokenizer.next.value == "+":
-    #             bin_op = Nodes.BinOp("+", [])
-
-    #         elif tokenizer.next.value == "-":
-    #             bin_op = Nodes.BinOp("-", [])
-
-    #         tokenizer.select_next()
-    #         # print("current token, parse_expression:", bin_op.value)
-    #         bin_op.children.append(result)
-    #         bin_op.children.append(Parser.parse_term(tokenizer))
-    #         return bin_op
-
-    #     # print("current result:", result.value)
-    #     return result
-

@@ -1,14 +1,16 @@
 import sys
 from Parser import Parser
-from comment_filter import comment_filter
-from file_reader import read_file_content
+from file_reader import read_file
+from SymbolTable import SymbolTable
 
 
 
 def main():
-    code = read_file_content(sys.argv[1])
-    code = comment_filter(code)
-    print(Parser.run(code).evaluate())
+    code = read_file(sys.argv[1])
+    # print("printing full code: ", code)
+    symbol_table = SymbolTable()
+    Parser.run(code).evaluate(symbol_table)
+
 
 
 if __name__ == "__main__":

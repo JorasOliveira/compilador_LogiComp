@@ -8,7 +8,8 @@ class Tokenizer:
 
     def select_next(self):
         if self.position < len(self.source):
-            while self.source[self.position] in [" ", "\n", "\t"] and self.position < len(self.source) -1:
+            # print("current token:", self.next.value)
+            while self.source[self.position] in [" ", "\t"] and self.position < len(self.source) -1:
                 self.position += 1
 
             if self.source[self.position] in ["+", "-", "*", "/"]:
@@ -24,6 +25,30 @@ class Tokenizer:
                 self.next = Token.Token("number", int(number_str))
                 self.position = end_index
 
+            elif self.source[self.position].isalpha():
+                end_index = self.position
+
+                while ( (self.source[end_index] != '(') and (self.source[end_index]!= "=") and (self.source[end_index] != ")")):
+                    end_index += 1
+
+                identifier_str = self.source[self.position : end_index]
+
+                if identifier_str == "Println":
+                    self.next = Token.Token("println", identifier_str)
+                    self.position = end_index
+
+                else:    
+                    self.next = Token.Token("identifier", identifier_str)
+                    self.position = end_index
+                    
+            elif self.source[self.position] == "=":
+                self.next = Token.Token("assingment", self.source[self.position])
+                self.position += 1
+
+            elif self.source[self.position] == "\n":
+                self.next = Token.Token("newline", self.source[self.position])
+                self.position += 1
+
             elif self.source[self.position] == "(":
                 self.open_parentheses_count += 1  # Increment open parentheses count
                 self.next = Token.Token("open_par", self.source[self.position])
@@ -37,9 +62,7 @@ class Tokenizer:
                 self.next = Token.Token("close_par", self.source[self.position])
                 self.position += 1
 
-            elif self.position >= len(self.source) -1:
-                if self.source[self.position] in [" ", "\n", "\t"]:
-                    self.next = Token.Token("none", 0)
-
             else:
                 raise Exception("Invalid character: " + self.source[self.position])
+            
+        else: self.next = Token.Token("none", 0)

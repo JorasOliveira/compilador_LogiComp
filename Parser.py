@@ -58,7 +58,7 @@ class Parser:
 
             if thing:
                 result.children.append(thing)
-                print("appending: ", thing.value)
+                # print("appending: ", thing.value)
             tokenizer.select_next()
         return result
 

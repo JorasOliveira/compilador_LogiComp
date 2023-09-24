@@ -8,7 +8,7 @@ class Tokenizer:
 
     def select_next(self):
         if self.position < len(self.source):
-            print("current token:", self.next.value)
+            # print("current token:", self.next.value)
             while self.source[self.position] in [" ", "\t"] and self.position < len(self.source) -1:
                 self.position += 1
 

@@ -4,8 +4,12 @@ import Nodes
 class Parser:
 
     def parse_statement(tokenizer):
-        # # print("token Type: ", tokenizer.next.type)
-        if tokenizer.next.type == "newline":
+        # print("token Type: ", tokenizer.next.type)
+
+        if isinstance(tokenizer.next.value, int):
+            raise Exception("incorrect sintax")
+        
+        elif tokenizer.next.type == "newline":
             tokenizer.select_next()
             no_op = Nodes.NoOp()
             return no_op
@@ -31,14 +35,21 @@ class Parser:
             if tokenizer.next.type == "open_par":
                 tokenizer.select_next()
                 # print("token Type 3: ", tokenizer.next.value)
-                expression = Parser.parse_statement(tokenizer)
-                # print("result at Token3: ", expression)
-                
-            if tokenizer.next.type == "close_par":
+                # print(isinstance(tokenizer.next.value, int))
+                if isinstance(tokenizer.next.value, int):                
+                    # print("result at Token3: ", expression)
+                    raise Exception("incorrect sintax")
+                else: 
+                    expression = Parser.parse_statement(tokenizer)
+                    
                 tokenizer.select_next()
-                result = Nodes.Print("Println", [expression])
-                return result
-        
+                if tokenizer.next.type == "close_par":
+                    tokenizer.select_next()
+                    result = Nodes.Print("Println", [expression])
+                    return result
+                
+            else: raise Exception("incorrect sintax")
+
     def parse_block(tokenizer):
         result = Nodes.Block("Block",[])
         
@@ -47,7 +58,7 @@ class Parser:
 
             if thing:
                 result.children.append(thing)
-                # print("appending: ", thing.value)
+                print("appending: ", thing.value)
             tokenizer.select_next()
         return result
 

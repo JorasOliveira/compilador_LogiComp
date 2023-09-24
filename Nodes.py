@@ -27,7 +27,9 @@ class Print(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+
         result = self.children[0].evaluate(symbol_table)
+
         print(result)
         return result
 

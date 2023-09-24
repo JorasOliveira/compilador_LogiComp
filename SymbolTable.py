@@ -9,7 +9,9 @@ class SymbolTable:
             pass
 
         else: 
-            # print("adding key: ", identifier, " Value: ", node)
+            print("adding key: ", identifier, " Value: ", node)
+            if identifier == "Println":
+                raise Exception("Incorrect Sintax")
             self.table[identifier] = node
 
     def get(self, identifier):

@@ -4,7 +4,7 @@ import Nodes
 class Parser:
 
     def parse_statement(tokenizer):
-        # print("token Type: ", tokenizer.next.type)
+        print("token Type: ", tokenizer.next.type)
 
         if isinstance(tokenizer.next.value, int):
             raise Exception("incorrect sintax")
@@ -31,13 +31,11 @@ class Parser:
         
         elif tokenizer.next.type == "println":
             tokenizer.select_next()
-
+            print("token Type 3: ", tokenizer.next.value)
             if tokenizer.next.type == "open_par":
                 tokenizer.select_next()
-                # print("token Type 3: ", tokenizer.next.value)
-                # print(isinstance(tokenizer.next.value, int))
+
                 if isinstance(tokenizer.next.value, int):                
-                    # print("result at Token3: ", expression)
                     expression = tokenizer.next.value
                 else: 
                     expression = Parser.parse_statement(tokenizer)

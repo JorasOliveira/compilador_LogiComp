@@ -14,12 +14,15 @@ class Block(Node):
 
     def evaluate(self, symbol_table):
         for child in self.children:
+            # print("evaluating: ", child.value)
             child.evaluate(symbol_table)
+
 class Identifier(Node):
     def __init__(self, value):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
+        # print("atemting to get: ", self.value)
         return symbol_table.get(self.value)
 
 class Print(Node):
@@ -27,6 +30,7 @@ class Print(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+        # print(self.children)
         
         if isinstance(self.children[0], int):
             result = self.children[0]
@@ -45,6 +49,7 @@ class Assignment(Node):
         if self.children[1] is not None:
             value = self.children[1].evaluate(symbol_table)
             symbol_table.set(self.children[0], value)
+
         else: 
             symbol_table.set(self.children[0], self.children[1])
         

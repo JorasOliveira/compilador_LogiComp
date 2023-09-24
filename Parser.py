@@ -31,12 +31,12 @@ class Parser:
             if tokenizer.next.type == "open_par":
                 tokenizer.select_next()
                 # print("token Type 3: ", tokenizer.next.value)
-                expression = Parser.parse_expression(tokenizer)
+                expression = Parser.parse_statement(tokenizer)
                 # print("result at Token3: ", expression)
                 
             if tokenizer.next.type == "close_par":
                 tokenizer.select_next()
-                result = Nodes.print("Println", [expression])
+                result = Nodes.Print("Println", [expression])
                 return result
         
     def parse_block(tokenizer):

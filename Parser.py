@@ -22,15 +22,15 @@ class Parser:
         elif tokenizer.next.type == "println":
             tokenizer.select_next()
             # print("token Type 3: ", tokenizer.next.value)
-
             if tokenizer.next.type == "open_par":
                 tokenizer.select_next()
 
                 if isinstance(tokenizer.next.value, int):                
                     expression = tokenizer.next.value
-
                 else: 
-                    expression = Parser.parse_expression(tokenizer)
+                    expression = Parser.parse_statement(tokenizer)
+                    
+                # tokenizer.select_next()
 
                 if tokenizer.next.type == "close_par":
                     tokenizer.select_next()

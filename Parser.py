@@ -4,6 +4,10 @@ import Nodes
 class Parser:
 
     def parse_statement(tokenizer):
+<<<<<<< HEAD
+=======
+        print("token Type: ", tokenizer.next.type)
+>>>>>>> parent of 50e32e0... a lot better now, but still spaghetty
 
         if tokenizer.next.type == "identifier":
             identifier = Nodes.Identifier(tokenizer.next.value)
@@ -20,11 +24,20 @@ class Parser:
         
         elif tokenizer.next.type == "println":
             tokenizer.select_next()
-
+            print("token Type 3: ", tokenizer.next.value)
             if tokenizer.next.type == "open_par":
                 tokenizer.select_next()
 
+<<<<<<< HEAD
                 expression = Parser.parse_expression(tokenizer)
+=======
+                if isinstance(tokenizer.next.value, int):                
+                    expression = tokenizer.next.value
+                else: 
+                    expression = Parser.parse_statement(tokenizer)
+                    
+                tokenizer.select_next()
+>>>>>>> parent of 50e32e0... a lot better now, but still spaghetty
 
                 if tokenizer.next.type == "close_par":
                     tokenizer.select_next()

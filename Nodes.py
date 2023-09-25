@@ -14,6 +14,7 @@ class Block(Node):
 
     def evaluate(self, symbol_table):
         for child in self.children:
+<<<<<<< HEAD
             # print("evaluating: ", child)
 
             if child.evaluate(symbol_table) == 6:
@@ -21,12 +22,14 @@ class Block(Node):
 
             # child.evaluate(symbol_table)
 
+=======
+            child.evaluate(symbol_table)
+>>>>>>> parent of 50e32e0... a lot better now, but still spaghetty
 class Identifier(Node):
     def __init__(self, value):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
-        # print("atemting to get: ", self.value)
         return symbol_table.get(self.value)
 
 class Print(Node):
@@ -34,7 +37,13 @@ class Print(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+<<<<<<< HEAD
         # print("printing: ", self.children)
+=======
+        
+        if isinstance(self.children[0], int):
+            result = self.children[0]
+>>>>>>> parent of 50e32e0... a lot better now, but still spaghetty
 
         result = self.children[0].evaluate(symbol_table)
         if result == 10:
@@ -53,7 +62,6 @@ class Assignment(Node):
             value = self.children[1].evaluate(symbol_table)
 
             symbol_table.set(self.children[0], value)
-
         else: 
             symbol_table.set(self.children[0], self.children[1])
         

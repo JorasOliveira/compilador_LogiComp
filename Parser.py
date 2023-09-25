@@ -4,30 +4,18 @@ import Nodes
 class Parser:
 
     def parse_statement(tokenizer):
-        # print("token Type: ", tokenizer.next.type)
 
-        if isinstance(tokenizer.next.value, int):
-            raise Exception("incorrect sintax")
-        
-        elif tokenizer.next.type == "newline":
-            tokenizer.select_next()
-            no_op = Nodes.NoOp()
-            return no_op
-        
-        elif tokenizer.next.type == "identifier":
+        if tokenizer.next.type == "identifier":
             identifier = Nodes.Identifier(tokenizer.next.value)
             tokenizer.select_next()
-            # print("token Type 2: ", tokenizer.next.value)
 
             if tokenizer.next.value == "=":
                 tokenizer.select_next()
                 symbol = Parser.parse_expression(tokenizer)
-                # print("symbol to be added: ", symbol, "for token: ", tokenizer.next.value)
 
                 result = Nodes.Assignment(identifier, [identifier.value, symbol])
                 return result
             
-            # print("idenfitier: ", identifier.value)
             return identifier
         
         elif tokenizer.next.type == "println":
@@ -35,13 +23,9 @@ class Parser:
 
             if tokenizer.next.type == "open_par":
                 tokenizer.select_next()
-                # print("token Type 3: ", tokenizer.next.value)
 
-                if isinstance(tokenizer.next.value, int):                
-                    expression = tokenizer.next.value
+                expression = Parser.parse_expression(tokenizer)
 
-                else: 
-                    expression = Parser.parse_statement(tokenizer)
                 if tokenizer.next.type == "close_par":
                     tokenizer.select_next()
                     result = Nodes.Print("Println", [expression])
@@ -58,6 +42,7 @@ class Parser:
             if thing:
                 result.children.append(thing)
                 # print("appending: ", thing.value)
+
             tokenizer.select_next()
         return result
 
@@ -87,8 +72,9 @@ class Parser:
 
             raise Exception("Unbalanced parentheses: '(' without ')'")
 
-        if tokenizer.next.type == "number":
+        if tokenizer.next.type == "number" or tokenizer.next.type == "identifier":
             result = tokenizer.next.value
+            # print("result at factor: ", result)
 
             number_node = Nodes.IntVal(result)
             tokenizer.select_next()
@@ -96,6 +82,7 @@ class Parser:
 
     def parse_term(tokenizer):
         result = Parser.parse_factor(tokenizer)
+
         while tokenizer.next is not None and tokenizer.next.value in ["*", "/"]:
             operator = tokenizer.next.value
             tokenizer.select_next()

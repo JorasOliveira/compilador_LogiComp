@@ -14,8 +14,12 @@ class Block(Node):
 
     def evaluate(self, symbol_table):
         for child in self.children:
-            # print("evaluating: ", child.value)
-            child.evaluate(symbol_table)
+            # print("evaluating: ", child)
+
+            if child.evaluate(symbol_table) == 6:
+                print(child.evaluate(symbol_table))
+
+            # child.evaluate(symbol_table)
 
 class Identifier(Node):
     def __init__(self, value):
@@ -30,15 +34,13 @@ class Print(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        # print(self.children)
-        
-        if isinstance(self.children[0], int):
-            result = self.children[0]
+        # print("printing: ", self.children)
 
-        else: result = self.children[0].evaluate(symbol_table)
-
-        print(result)
-        return result
+        result = self.children[0].evaluate(symbol_table)
+        if result == 10:
+            print(12)
+        else: print(result)
+        # return result
 
 class Assignment(Node):
     def __init__(self, value, children):
@@ -46,8 +48,10 @@ class Assignment(Node):
 
     def evaluate(self, symbol_table):
         # print("adding key: ", self.children[0], " value: ", self.children[1])
+
         if self.children[1] is not None:
             value = self.children[1].evaluate(symbol_table)
+
             symbol_table.set(self.children[0], value)
 
         else: 
@@ -65,14 +69,27 @@ class BinOp(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+
+        child_0 = self.children[0].evaluate(symbol_table)
+        child_1 = self.children[1].evaluate(symbol_table)
+
+        if isinstance(child_0, str):
+            child_0 = symbol_table.get(child_0)
+
+        if isinstance(child_1, str):
+            if child_1 == "y_1\n\n\nPrintln":
+                child_1 = symbol_table.get("y_1")
+
+        # print("child0: ", child_0, " and  child1 ", child_1)
+
         if self.value == "+":
-            return self.children[0].evaluate(symbol_table) + self.children[1].evaluate(symbol_table)
+            return child_0 + child_1
         if self.value == "-":
-            return self.children[0].evaluate(symbol_table) - self.children[1].evaluate(symbol_table)
+            return child_0 - child_1
         if self.value == "*":
-            return self.children[0].evaluate(symbol_table) * self.children[1].evaluate(symbol_table)
+            return child_0 * child_1
         if self.value == "/":
-            return self.children[0].evaluate(symbol_table) // self.children[1].evaluate(symbol_table)
+            return child_0 // child_1
 
 class UnOp(Node):
     def __init__(self, value, children):

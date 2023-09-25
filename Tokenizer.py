@@ -18,6 +18,7 @@ class Tokenizer:
 
             elif self.source[self.position].isdigit() and self.next.type != "number":
                 end_index = self.position
+                
                 while end_index < len(self.source) and self.source[end_index].isdigit():
                     end_index += 1
 
@@ -28,7 +29,7 @@ class Tokenizer:
             elif self.source[self.position].isalpha():
                 end_index = self.position
 
-                while ( (self.source[end_index] != '(') and (self.source[end_index]!= "=") and (self.source[end_index] != ")")):
+                while ( (self.source[end_index] != '(') and (self.source[end_index]!= "=") and (self.source[end_index] != ")") and (self.source[end_index] not in ["+", "-", "*", "/"]) ):
                     end_index += 1
 
                 identifier_str = self.source[self.position : end_index]

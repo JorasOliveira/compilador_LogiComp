@@ -14,17 +14,9 @@ class Block(Node):
 
     def evaluate(self, symbol_table):
         for child in self.children:
-<<<<<<< HEAD
-            # print("evaluating: ", child)
-
-            if child.evaluate(symbol_table) == 6:
-                print(child.evaluate(symbol_table))
-
-            # child.evaluate(symbol_table)
-
-=======
+            # print("evaluating child: ", child.value)
             child.evaluate(symbol_table)
->>>>>>> parent of 50e32e0... a lot better now, but still spaghetty
+
 class Identifier(Node):
     def __init__(self, value):
         super().__init__(value, [])
@@ -37,27 +29,20 @@ class Print(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-<<<<<<< HEAD
-        # print("printing: ", self.children)
-=======
         
         if isinstance(self.children[0], int):
             result = self.children[0]
->>>>>>> parent of 50e32e0... a lot better now, but still spaghetty
+            print(result)
 
-        result = self.children[0].evaluate(symbol_table)
-        if result == 10:
-            print(12)
-        else: print(result)
-        # return result
+        else:
+            result = self.children[0].evaluate(symbol_table)
+            print(result)
 
 class Assignment(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        # print("adding key: ", self.children[0], " value: ", self.children[1])
-
         if self.children[1] is not None:
             value = self.children[1].evaluate(symbol_table)
 
@@ -87,8 +72,6 @@ class BinOp(Node):
         if isinstance(child_1, str):
             if child_1 == "y_1\n\n\nPrintln":
                 child_1 = symbol_table.get("y_1")
-
-        # print("child0: ", child_0, " and  child1 ", child_1)
 
         if self.value == "+":
             return child_0 + child_1

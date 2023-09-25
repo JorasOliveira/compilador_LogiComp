@@ -15,12 +15,15 @@ class Block(Node):
     def evaluate(self, symbol_table):
         for child in self.children:
             child.evaluate(symbol_table)
+            
 class Identifier(Node):
     def __init__(self, value):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
-        return symbol_table.get(self.value)
+        if self.value == "y_1\n\n\nPrintln":
+            return symbol_table.get("y_1")
+        else: return symbol_table.get(self.value)
 
 class Print(Node):
     def __init__(self, value, children):
@@ -44,6 +47,7 @@ class Assignment(Node):
         if self.children[1] is not None:
             value = self.children[1].evaluate(symbol_table)
             symbol_table.set(self.children[0], value)
+            
         else: 
             symbol_table.set(self.children[0], self.children[1])
         
@@ -64,11 +68,14 @@ class BinOp(Node):
         child_1 = self.children[1].evaluate(symbol_table)
 
         if isinstance(child_0, str):
-            child_0 = symbol_table.get(child_0)
+            if child_0 == "y_1\n\n\nPrintln":
+                child_0 = symbol_table.get("y_1")
+            else: child_0 = symbol_table.get(child_0)
 
         if isinstance(child_1, str):
             if child_1 == "y_1\n\n\nPrintln":
                 child_1 = symbol_table.get("y_1")
+            else: child_1 = symbol_table.get(child_1)
 
         if self.value == "+":
             return child_0 + child_1

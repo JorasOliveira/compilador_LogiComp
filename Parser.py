@@ -4,7 +4,7 @@ import Nodes
 class Parser:
 
     def parse_statement(tokenizer):
-        # print("token Type: ", tokenizer.next.type)
+
 
         if tokenizer.next.type == "identifier":
             identifier = Nodes.Identifier(tokenizer.next.value)
@@ -21,23 +21,35 @@ class Parser:
         
         elif tokenizer.next.type == "println":
             tokenizer.select_next()
-            # print("token Type 3: ", tokenizer.next.value)
+            # print("next token 1: ", tokenizer.next.value)
+            # print("next token 1: ", tokenizer.next.type)
+
             if tokenizer.next.type == "open_par":
                 tokenizer.select_next()
+                # print("next token 2: ", tokenizer.next.value)
+                # print("next token 2: ", tokenizer.next.type)
+
 
                 if isinstance(tokenizer.next.value, int):                
                     expression = tokenizer.next.value
+                    tokenizer.select_next()
+
                 else: 
-                    expression = Parser.parse_statement(tokenizer)
-                    
-                # tokenizer.select_next()
+                    expression = Parser.parse_expression(tokenizer)
+                    tokenizer.select_next()
 
                 if tokenizer.next.type == "close_par":
                     tokenizer.select_next()
                     result = Nodes.Print("Println", [expression])
                     return result
                 
+            if tokenizer.next.type == "newline":
+                tokenizer.select_next()
+                return 
+            
             else: raise Exception("incorrect sintax")
+
+        elif isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
 
     def parse_block(tokenizer):
         result = Nodes.Block("Block",[])
@@ -47,7 +59,6 @@ class Parser:
 
             if thing:
                 result.children.append(thing)
-                # print("appending: ", thing.value)
 
             tokenizer.select_next()
         return result
@@ -71,7 +82,6 @@ class Parser:
             tokenizer.select_next()
             result = Parser.parse_expression(tokenizer)
 
-
             if tokenizer.next.type == "close_par":
                 tokenizer.select_next()
                 return result
@@ -80,9 +90,14 @@ class Parser:
 
         if tokenizer.next.type == "number" or tokenizer.next.type == "identifier":
             result = tokenizer.next.value
-            number_node = Nodes.IntVal(result)
+
+            if tokenizer.next.type == "identifier":
+                node = Nodes.Identifier(result)
+
+            else: node = Nodes.IntVal(result)
+
             tokenizer.select_next()
-            return number_node
+            return node
 
     def parse_term(tokenizer):
         result = Parser.parse_factor(tokenizer)

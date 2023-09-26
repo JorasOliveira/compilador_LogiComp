@@ -16,6 +16,10 @@ class Parser:
             if tokenizer.next.value == "=":
                 tokenizer.select_next()
                 symbol = Parser.parse_expression(tokenizer)
+
+                if tokenizer.next.type != "newline":
+                    raise Exception("incorrect sintax")
+
                 return Nodes.Assignment(identifier, [identifier.value, symbol])
             
             return identifier
@@ -31,12 +35,9 @@ class Parser:
                     tokenizer.select_next()
                     return Nodes.Print("Println", [expression])
                 
-        # if tokenizer.next.type == "newline":
-        #     tokenizer.select_next()
+        if isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
 
-        # else: raise Exception("incorrect sintax")
-                
-        # elif isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
+        elif tokenizer.next.type == "newline": raise Exception("incorrect sintax")
 
     def parse_block(tokenizer):
         result = Nodes.Block("Block",[])
@@ -45,7 +46,7 @@ class Parser:
             thing = Parser.parse_statement(tokenizer)
             # print("thing: ", thing)
 
-            if thing:
+            if thing != None:
                 result.children.append(thing)
 
             tokenizer.select_next()

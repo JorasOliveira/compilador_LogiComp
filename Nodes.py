@@ -36,11 +36,13 @@ class Print(Node):
         
         if isinstance(self.children[0], int):
             result = self.children[0]
-            print(result)
+            if result != None:
+                print(result)
 
         else:
             result = self.children[0].evaluate(symbol_table)
-            print(result)
+            if result != None:
+                print(result)
 
 class Assignment(Node):
     def __init__(self, value, children):

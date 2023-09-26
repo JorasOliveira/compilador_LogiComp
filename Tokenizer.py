@@ -65,4 +65,4 @@ class Tokenizer:
             else:
                 raise Exception("Invalid character: " + self.source[self.position])
             
-        else: self.next = Token.Token("none", 0)
+        else: self.next = Token.Token("none", None)

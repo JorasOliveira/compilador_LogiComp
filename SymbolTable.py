@@ -5,9 +5,6 @@ class SymbolTable:
     def set(self, identifier, node):
         identifier = identifier.strip()
 
-
-        # print("adding key: ", identifier, " Value: ", node)
-
         if identifier == "Println":
             raise Exception("Incorrect Sintax")
         
@@ -16,12 +13,9 @@ class SymbolTable:
     def get(self, identifier):
 
         identifier = identifier.strip()
-        # print("atempting to get: ", identifier )  
-        # print("current keys are: ", self.table.keys())  
 
         if identifier in self.table:
             result = self.table[identifier]
-            # print("we got: ", result)
 
             if result:
                 return result 

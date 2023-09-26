@@ -8,16 +8,15 @@ class Tokenizer:
 
     def select_next(self):
         if self.position < len(self.source):
-            # print("current token:", self.next.value)
-            # print("current token type:", self.next.type)
-            while self.source[self.position] in [" ", "\t"] and self.position < len(self.source) -1:
+            # print("current token: " + str(self.next.value), "of type: ", self.next.type)
+            while self.source[self.position] in [" ", "\t"] and self.position < len(self.source):
                 self.position += 1
 
             if self.source[self.position] in ["+", "-", "*", "/"]:
                 self.next = Token.Token("operator", self.source[self.position])
                 self.position += 1
 
-            elif self.source[self.position].isdigit() and self.next.type != "number":
+            elif self.source[self.position].isdigit():
                 end_index = self.position
                 
                 while end_index < len(self.source) and self.source[end_index].isdigit():
@@ -30,19 +29,18 @@ class Tokenizer:
             elif self.source[self.position].isalpha():
                 end_index = self.position
 
-                while ( (self.source[end_index] != '(') and (self.source[end_index]!= "=") and (self.source[end_index] != ")") and (self.source[end_index] not in ["+", "-", "*", "/"]) ):
+                while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "="]):
                     end_index += 1
 
                 identifier_str = self.source[self.position : end_index]
+                self.position = end_index
 
                 if identifier_str == "Println":
                     self.next = Token.Token("println", identifier_str)
-                    self.position = end_index
 
                 else:    
                     self.next = Token.Token("identifier", identifier_str)
-                    self.position = end_index
-                    
+
             elif self.source[self.position] == "=":
                 self.next = Token.Token("assingment", self.source[self.position])
                 self.position += 1

@@ -5,20 +5,23 @@ class SymbolTable:
     def set(self, identifier, node):
         identifier = identifier.strip()
 
-        if identifier in self.table or node is None:
-            pass
 
-        else: 
-            # print("adding key: ", identifier, " Value: ", node)
-            if identifier == "Println":
-                raise Exception("Incorrect Sintax")
-            self.table[identifier] = node
+        # print("adding key: ", identifier, " Value: ", node)
+
+        if identifier == "Println":
+            raise Exception("Incorrect Sintax")
+        
+        self.table[identifier] = node
 
     def get(self, identifier):
 
-        identifier = identifier.strip()    
+        identifier = identifier.strip()
+        # print("atempting to get: ", identifier )  
+        # print("current keys are: ", self.table.keys())  
+
         if identifier in self.table:
             result = self.table[identifier]
+            # print("we got: ", result)
 
             if result:
                 return result 

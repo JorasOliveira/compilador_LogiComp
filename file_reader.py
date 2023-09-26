@@ -6,6 +6,7 @@ def read_file(filename):
 
             if comment_index == 0:
                 pass
+
             elif comment_index != -1:
                 result_string += line[:comment_index] + '\n'
 

@@ -21,8 +21,10 @@ class Identifier(Node):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
+
         if self.value == "y_1\n\n\nPrintln":
             return symbol_table.get("y_1")
+        
         else: return symbol_table.get(self.value)
 
 class Print(Node):
@@ -30,6 +32,7 @@ class Print(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+        # print("evaluate do print: ", self.children[0])
         
         if isinstance(self.children[0], int):
             result = self.children[0]
@@ -44,6 +47,8 @@ class Assignment(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+        # print("evaluating assngment of: ", self.children[0], " to: ", self.children[1])
+        
         if self.children[1] is not None:
             value = self.children[1].evaluate(symbol_table)
             symbol_table.set(self.children[0], value)

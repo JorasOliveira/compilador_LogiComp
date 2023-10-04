@@ -8,15 +8,21 @@ class Tokenizer:
 
     def select_next(self):
         if self.position < len(self.source):
-            # print("current token: " + str(self.next.value), "of type: ", self.next.type)
-            while self.source[self.position] in [" ", "\t"] and self.position < len(self.source):
+            print("current token: " + str(self.next.value), "of type:", self.next.type)
+            while self.source[self.position] in [" ", "\t"] and self.position < len(self.source): #passes white space
                 self.position += 1
 
-            if self.source[self.position] in ["+", "-", "*", "/"]:
-                self.next = Token.Token("operator", self.source[self.position])
-                self.position += 1
+            if self.source[self.position] in ["+", "-", "*", "/", "<", ">", "!", "=", "|", "&"]: #tokenizes operators
 
-            elif self.source[self.position].isdigit():
+                if self.source[self.position + 1] in ["=", "|", "&"]:
+                    self.next = Token.Token("operator", self.source[self.position] + self.source[self.position + 1] )
+                    self.position += 2
+
+                else:
+                    self.next = Token.Token("operator", self.source[self.position])
+                    self.position += 1
+                
+            elif self.source[self.position].isdigit(): #Tokenizes full numbers
                 end_index = self.position
                 
                 while end_index < len(self.source) and self.source[end_index].isdigit():
@@ -26,10 +32,10 @@ class Tokenizer:
                 self.next = Token.Token("number", int(number_str))
                 self.position = end_index
 
-            elif self.source[self.position].isalpha():
+            elif self.source[self.position].isalpha(): #tokenizes variable names
                 end_index = self.position
 
-                while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "="]):
+                while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "=", " "]):
                     end_index += 1
 
                 identifier_str = self.source[self.position : end_index]
@@ -38,8 +44,33 @@ class Tokenizer:
                 if identifier_str == "Println":
                     self.next = Token.Token("println", identifier_str)
 
+                if identifier_str == "if":
+                    self.next = Token.Token("if", identifier_str)
+                
+                if identifier_str == "for":
+                    self.next = Token.Token("for", identifier_str)
+                
+                if identifier_str == "else":
+                    self.next = Token.Token("else", identifier_str)
+
+                if identifier_str == ":=":
+                    self.next = Token.Token("assingment", identifier_str)
+
                 else:    
                     self.next = Token.Token("identifier", identifier_str)
+            #the next few are self explenatory, tokenizes the specied token
+
+            elif self.source[self.position] == ";":
+                self.next = Token.Token("semicolon", self.source[self.position])
+                self.position += 1
+
+            elif self.source[self.position] == "{":
+                self.next = Token.Token("open_bracket", self.source[self.position])
+                self.position += 1
+
+            elif self.source[self.position] == "}":
+                self.next = Token.Token("close_bracket", self.source[self.position])
+                self.position += 1
 
             elif self.source[self.position] == "=":
                 self.next = Token.Token("assingment", self.source[self.position])

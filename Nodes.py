@@ -21,6 +21,7 @@ class Identifier(Node):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
+        # print("atempting to get: ", self.value, " from symbol table")
 
         if self.value == "y_1\n\n\nPrintln":
             return symbol_table.get("y_1")

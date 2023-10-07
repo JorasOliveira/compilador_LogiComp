@@ -7,11 +7,11 @@ class Parser:
         
         while tokenizer.next.type != "none":
             thing = Parser.parse_statement(tokenizer)
-            # print("thing: ", thing)
+            # print("thing, parse_program: ", thing)
 
             if thing != None:
                 result.children.append(thing)
-
+                
             tokenizer.select_next()
         return result
     
@@ -24,27 +24,28 @@ class Parser:
             if tokenizer.next.value == "\n":
                 tokenizer.select_next()
 
-                while tokenizer.next.type != "none":
+                while (tokenizer.next.type != "none") and (tokenizer.next.value != "}"):
                     thing = Parser.parse_statement(tokenizer)
+                    # print("thing, parse_block: ", thing)
 
                     if thing != None:
                         result.children.append(thing)
 
                     tokenizer.select_next()
 
-            else: raise Exception("incorrect sintax")
-
-            if tokenizer.next.value == "}":
-                return result
+                # print("parse_block: ", tokenizer.next.value, " of type", tokenizer.next.type)
+                if tokenizer.next.value == "}":
+                    tokenizer.select_next()
+                    # print("returning block, tokenizer.next.value: ", tokenizer.next.value)
+                    return result
             
-        # raise Exception("incorrect sintax")
-
+    #TODO -> implementar o Scanln
     def parse_statement(tokenizer): #TODO -> implementar o if and for aqui
-        print("parse_statement: ", tokenizer.next.value)
+        # print("parse_statement: ", tokenizer.next.value, " of type", tokenizer.next.type)
         while tokenizer.next.type == "newline":
             tokenizer.select_next()
         
-        if tokenizer.next.type == "identifier" and (tokenizer.next.value not in ["if", "for", "else"]):
+        if tokenizer.next.type == "identifier":
             identifier = Parser.parse_assingment(tokenizer)
             return identifier
         
@@ -64,18 +65,12 @@ class Parser:
            
             tokenizer.select_next()
             expression = Parser.bool_expression(tokenizer)
-            print("expression: ", expression)
-            print("token value inside if: ", tokenizer.next.value)
-            print(1)
-
             block = Parser.parse_block(tokenizer)
 
             if tokenizer.next.type == "else":
-                print(2)
                 tokenizer.select_next()
                 block2 = Parser.parse_block(tokenizer)
-                return Nodes.Else("If", [expression, block, block2])
-            print(3)        
+                return Nodes.Else("If", [expression, block, block2])       
             return Nodes.If("If", [expression, block])
                 
         elif tokenizer.next.value == "for":
@@ -92,10 +87,10 @@ class Parser:
                     block = Parser.parse_block(tokenizer)
                     return Nodes.For("For", [assingment, expression, assingment2, block])
 
-        elif (tokenizer.next.type == "newline") or isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
+        elif (tokenizer.next.value in ["{", "}", "\n"]) or isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
 
     def parse_assingment(tokenizer):
-        print("Token: ", tokenizer.next.value, " of type: ", tokenizer.next.type, ", parser assingment")
+        # print("Token: ", tokenizer.next.value, " of type: ", tokenizer.next.type, ", parser assingment")
 
         if tokenizer.next.type == "identifier":
             identifier = Nodes.Identifier(tokenizer.next.value)
@@ -104,7 +99,6 @@ class Parser:
             if tokenizer.next.value == "=":
                 tokenizer.select_next()
                 symbol = Parser.bool_expression(tokenizer)
-                #used to have a if tokenizer.next.type == "newline": tokenizer.select_next() + return here
                 return Nodes.Assignment(identifier, [identifier.value, symbol])
             
         raise Exception("incorrect sintax")

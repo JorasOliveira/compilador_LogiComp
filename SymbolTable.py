@@ -4,6 +4,7 @@ class SymbolTable:
 
     def set(self, identifier, node):
         identifier = identifier.strip()
+        # print("putting: ", identifier, " in symbol table")
 
         if identifier == "Println":
             raise Exception("Incorrect Sintax")

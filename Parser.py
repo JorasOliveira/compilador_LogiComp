@@ -6,6 +6,7 @@ class Parser:
         result = Nodes.Block("Block",[])
         
         while tokenizer.next.type != "none":
+            # print("in parse_program, token: ", tokenizer.next.value, " of type: ", tokenizer.next.type)
             thing = Parser.parse_statement(tokenizer)
             # print("thing, parse_program: ", thing)
 
@@ -13,6 +14,7 @@ class Parser:
                 result.children.append(thing)
                 
             tokenizer.select_next()
+            
         return result
     
     def parse_block(tokenizer):
@@ -87,7 +89,7 @@ class Parser:
                     block = Parser.parse_block(tokenizer)
                     return Nodes.For("For", [assingment, expression, assingment2, block])
 
-        elif (tokenizer.next.value in ["{", "}", "\n"]) or isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
+        elif (tokenizer.next.value in ["{", "}"]) or isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
 
     def parse_assingment(tokenizer):
         # print("Token: ", tokenizer.next.value, " of type: ", tokenizer.next.type, ", parser assingment")
@@ -95,6 +97,7 @@ class Parser:
         if tokenizer.next.type == "identifier":
             identifier = Nodes.Identifier(tokenizer.next.value)
             tokenizer.select_next()
+            
 
             if tokenizer.next.value == "=":
                 tokenizer.select_next()
@@ -139,6 +142,7 @@ class Parser:
             else: node = Nodes.IntVal(tokenizer.next.value)
 
             tokenizer.select_next()
+            if (tokenizer.next.value.isalpha()): raise Exception("incorrect sintax")
             return node
 
     def parse_term(tokenizer):
@@ -154,6 +158,7 @@ class Parser:
 
     def parse_expression(tokenizer):
         result = Parser.parse_term(tokenizer)
+
         while tokenizer.next is not None and tokenizer.next.value in ["+", "-"]:
             operator = tokenizer.next.value
             tokenizer.select_next()

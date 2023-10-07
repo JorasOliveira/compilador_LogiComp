@@ -34,7 +34,8 @@ class Tokenizer:
                     
             elif self.source[self.position].isalpha(): #tokenizes variable names
                 end_index = self.position
-
+                # print("currently we have: ", self.source[self.position])
+                # print("the next char is: ", self.source[self.position + 1])
                 while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "=", " ", "\n"]):
                     end_index += 1
 

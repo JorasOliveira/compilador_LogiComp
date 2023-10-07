@@ -138,9 +138,9 @@ class Parser:
             tokenizer.select_next()
             if tokenizer.next.type == "open_par":
                 result = input()
-                result = Nodes.IntVal(result)
+                result = Nodes.IntVal(int(result))
 
-            # tokenizer.select_next()
+            tokenizer.select_next()
 
             if tokenizer.next.type == "close_par":
                 tokenizer.select_next()

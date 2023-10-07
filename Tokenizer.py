@@ -45,6 +45,9 @@ class Tokenizer:
                 if identifier_str == "Println":
                     self.next = Token.Token("println", identifier_str)
 
+                elif identifier_str == "Scanln":
+                    self.next = Token.Token("scanln", identifier_str)
+
                 elif identifier_str == "if":
                     self.next = Token.Token("if", identifier_str)
                 

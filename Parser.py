@@ -133,8 +133,23 @@ class Parser:
                 return result
 
             raise Exception("Unbalanced parentheses: '(' without ')'")
+        
+        if tokenizer.next.type == "scanln":
+            tokenizer.select_next()
+            if tokenizer.next.type == "open_par":
+                result = input()
+                result = Nodes.IntVal(result)
 
-        if tokenizer.next.type == "number" or tokenizer.next.type == "identifier":
+            # tokenizer.select_next()
+
+            if tokenizer.next.type == "close_par":
+                tokenizer.select_next()
+                return result
+
+            # raise Exception("Unbalanced parentheses: '(' without ')'")
+
+
+        elif tokenizer.next.type == "number" or tokenizer.next.type == "identifier":
 
             if tokenizer.next.type == "identifier":
                 node = Nodes.Identifier(tokenizer.next.value)

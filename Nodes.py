@@ -105,6 +105,7 @@ class BinOp(Node):
 
         child_0 = self.children[0].evaluate(symbol_table)
         child_1 = self.children[1].evaluate(symbol_table)
+        # print("in binop, child_0: ", child_0, " child_1: ", child_1, " value: ", self.value)
 
         if isinstance(child_0, str):
             if child_0 == "y_1\n\n\nPrintln":
@@ -115,25 +116,26 @@ class BinOp(Node):
             if child_1 == "y_1\n\n\nPrintln":
                 child_1 = symbol_table.get("y_1")
             else: child_1 = symbol_table.get(child_1)
-
-        if self.value == "+":
-            return child_0 + child_1
-        if self.value == "-":
-            return child_0 - child_1
-        if self.value == "*":
-            return child_0 * child_1
-        if self.value == "/":
-            return child_0 // child_1
-        if self.value == '||':
-            return child_0 or child_1
-        if self.value == "&&":
-            return child_0 and child_1
-        if self.value == "==":
-            return (child_0 == child_1)
-        if self.value == ">":
-            return child_0 > child_1
-        if self.value == "<":
-            return child_0 < child_1
+        
+        if child_0 != None and child_1 != None:
+            if self.value == "+":
+                return child_0 + child_1
+            if self.value == "-":
+                return child_0 - child_1
+            if self.value == "*":
+                return child_0 * child_1
+            if self.value == "/":
+                return child_0 // child_1
+            if self.value == '||':
+                return child_0 or child_1
+            if self.value == "&&":
+                return child_0 and child_1
+            if self.value == "==":
+                return (child_0 == child_1)
+            if self.value == ">":
+                return child_0 > child_1
+            if self.value == "<":
+                return child_0 < child_1
 
 class UnOp(Node):
     def __init__(self, value, children):

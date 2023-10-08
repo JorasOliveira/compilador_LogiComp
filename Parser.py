@@ -6,9 +6,7 @@ class Parser:
         result = Nodes.Block("Block",[])
         
         while tokenizer.next.type != "none":
-            # print("in parse_program, token: ", tokenizer.next.value, " of type: ", tokenizer.next.type)
             thing = Parser.parse_statement(tokenizer)
-            # print("thing, parse_program: ", thing)
 
             if thing != None:
                 result.children.append(thing)
@@ -28,22 +26,18 @@ class Parser:
 
                 while (tokenizer.next.type != "none") and (tokenizer.next.value != "}"):
                     thing = Parser.parse_statement(tokenizer)
-                    # print("thing, parse_block: ", thing)
 
                     if thing != None:
                         result.children.append(thing)
 
                     tokenizer.select_next()
 
-                # print("parse_block: ", tokenizer.next.value, " of type", tokenizer.next.type)
                 if tokenizer.next.value == "}":
                     tokenizer.select_next()
-                    # print("returning block, tokenizer.next.value: ", tokenizer.next.value)
                     return result
-            
-    #TODO -> implementar o Scanln
-    def parse_statement(tokenizer): #TODO -> implementar o if and for aqui
-        # print("parse_statement: ", tokenizer.next.value, " of type", tokenizer.next.type)
+        
+    def parse_statement(tokenizer):
+        
         while tokenizer.next.type == "newline":
             tokenizer.select_next()
         
@@ -61,8 +55,7 @@ class Parser:
                 if tokenizer.next.type == "close_par":
                     tokenizer.select_next()
                     return Nodes.Print("Println", [expression])
-
-        #TODO -> checar se esta tudo certo aqui       
+                   
         elif tokenizer.next.value == "if":
            
             tokenizer.select_next()
@@ -72,7 +65,8 @@ class Parser:
             if tokenizer.next.type == "else":
                 tokenizer.select_next()
                 block2 = Parser.parse_block(tokenizer)
-                return Nodes.Else("If", [expression, block, block2])       
+                return Nodes.Else("else", [expression, block, block2])   
+                
             return Nodes.If("If", [expression, block])
                 
         elif tokenizer.next.value == "for":
@@ -92,8 +86,6 @@ class Parser:
         elif (tokenizer.next.value in ["{", "}"]) or isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
 
     def parse_assingment(tokenizer):
-        # print("Token: ", tokenizer.next.value, " of type: ", tokenizer.next.type, ", parser assingment")
-
         if tokenizer.next.type == "identifier":
             identifier = Nodes.Identifier(tokenizer.next.value)
             tokenizer.select_next()
@@ -188,7 +180,7 @@ class Parser:
         if tokenizer.next.value in ["<", ">", "=="]:
             operator = tokenizer.next.value
             tokenizer.select_next()
-            right_operand = Parser.parse_expression(tokenizer) #coreto?
+            right_operand = Parser.parse_expression(tokenizer) 
             result = Nodes.BinOp(operator, [result, right_operand])
         return result
 
@@ -197,7 +189,7 @@ class Parser:
 
         if tokenizer.next.value == "&&":
             tokenizer.select_next()
-            right_operand = Parser.bool_term(tokenizer) #coreto?
+            right_operand = Parser.bool_term(tokenizer)
             result = Nodes.BinOp("&&", [result, right_operand])
         return result
 
@@ -206,15 +198,13 @@ class Parser:
 
         if tokenizer.next.value == "||":
             tokenizer.select_next()
-            right_operand = Parser.bool_expression(tokenizer) #Coreto?
+            right_operand = Parser.bool_expression(tokenizer) 
             result = Nodes.BinOp("||", [result, right_operand])
         return result
     
     def run(code):
         tokenizer = Tokenizer.Tokenizer(code, 0)
         tokenizer.select_next()
-        
-        #TODO -> alterar para a chamada certa!
         result = Parser.parse_program(tokenizer)
 
         if tokenizer.open_parentheses_count != 0:

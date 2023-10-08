@@ -8,7 +8,6 @@ class Tokenizer:
 
     def select_next(self):
         if self.position < len(self.source):
-            # print("current token: " + str(self.next.value), "of type:", self.next.type)
             while self.source[self.position] in [" ", "\t"] and self.position < len(self.source): #passes white space
                 self.position += 1
 
@@ -34,8 +33,6 @@ class Tokenizer:
                     
             elif self.source[self.position].isalpha(): #tokenizes variable names
                 end_index = self.position
-                # print("currently we have: ", self.source[self.position])
-                # print("the next char is: ", self.source[self.position + 1])
                 while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "=", " ", "\n"]):
                     end_index += 1
 

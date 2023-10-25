@@ -7,11 +7,13 @@ class Tokenizer:
         self.open_parentheses_count = 0  # Keep track of open parentheses
 
     def select_next(self):
+        #TODO -> "string", lidar com isso corretamente
         if self.position < len(self.source):
+            # print(self.source[self.position])
             while self.source[self.position] in [" ", "\t"] and self.position < len(self.source): #passes white space
                 self.position += 1
 
-            if self.source[self.position] in ["+", "-", "*", "/", "<", ">", "!", "=", "|", "&"]: #tokenizes operators
+            if self.source[self.position] in ["+", "-", "*", "/", "<", ">", "!", "=", "|", "&", "."]: #tokenizes operators
 
                 if self.source[self.position + 1] in ["=", "|", "&"]:
                     self.next = Token.Token("operator", self.source[self.position] + self.source[self.position + 1] )
@@ -44,7 +46,16 @@ class Tokenizer:
 
                 elif identifier_str == "Scanln":
                     self.next = Token.Token("scanln", identifier_str)
+                
+                elif identifier_str == "var":
+                    self.next = Token.Token("varDec", identifier_str)
+                
+                elif identifier_str == "int":
+                    self.next = Token.Token("type", identifier_str)
 
+                elif identifier_str == "string":
+                    self.next = Token.Token("type", identifier_str)
+                
                 elif identifier_str == "if":
                     self.next = Token.Token("if", identifier_str)
                 

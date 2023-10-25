@@ -2,12 +2,12 @@ class SymbolTable:
     def __init__(self):
         self.table = {}
 
-    def set(self, identifier, node):
+    def set(self, identifier, type, node):
         identifier = identifier.strip()
         if identifier == "Println":
             raise Exception("Incorrect Sintax")
         
-        self.table[identifier] = node
+        self.table[identifier] = (type, node)
 
     def get(self, identifier):
 

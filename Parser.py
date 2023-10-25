@@ -82,6 +82,19 @@ class Parser:
                     assingment2 = Parser.parse_assingment(tokenizer)
                     block = Parser.parse_block(tokenizer)
                     return Nodes.For("For", [assingment, expression, assingment2, block])
+        
+        elif tokenizer.next.type == "varDec":
+            tokenizer.select_next()
+            identifier = Parser.parse_assingment(tokenizer)       
+
+            if tokenizer.next.type == "type":
+                type = Nodes.Type(tokenizer.value, []) #oque eu faco com isso??
+                tokenizer.select_next()
+                
+                if tokenizer.next.value == "=":
+                    tokenizer.select_next()
+                    value = Parser.bool_expression(tokenizer)
+                    return Nodes.VarDec(identifier, value)
 
         elif (tokenizer.next.value in ["{", "}"]) or isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
 
@@ -100,6 +113,10 @@ class Parser:
 
     def parse_factor(tokenizer):
         result = 0
+
+        if tokenizer.next.type == "String":
+            return Nodes.VarDec("String", [tokenizer.next.value])
+            tokenizer.select_next()
 
         if tokenizer.next.type == "operator":
             
@@ -155,7 +172,7 @@ class Parser:
     def parse_term(tokenizer):
         result = Parser.parse_factor(tokenizer)
 
-        while tokenizer.next is not None and tokenizer.next.value in ["*", "/"]:
+        while tokenizer.next is not None and tokenizer.next.value in ["*", "/",]:
             operator = tokenizer.next.value
             tokenizer.select_next()
             right_operand = Parser.parse_factor(tokenizer)
@@ -166,7 +183,7 @@ class Parser:
     def parse_expression(tokenizer):
         result = Parser.parse_term(tokenizer)
 
-        while tokenizer.next is not None and tokenizer.next.value in ["+", "-"]:
+        while tokenizer.next is not None and tokenizer.next.value in ["+", "-", "."]:
             operator = tokenizer.next.value
             tokenizer.select_next()
             right_operand = Parser.parse_term(tokenizer)

@@ -8,6 +8,9 @@ class Node:
     def evaluate(self, symbol_table):
         return self.value
         
+
+#TODO -> terminar de cuidar dos retornos corretos
+#TODO -> implementar a tipagem forte
 class Block(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
@@ -15,7 +18,20 @@ class Block(Node):
     def evaluate(self, symbol_table):
         for child in self.children:
             child.evaluate(symbol_table)
+
+class Assignment(Node):
+    def __init__(self, value, children):
+        super().__init__(value, children)
+
+    def evaluate(self, symbol_table):
+        if self.children[1] is not None:
+            node = self.children[1].evaluate(symbol_table)
+
+            symbol_table.set(self.children[0], node[0], node[1])
             
+        else: 
+            symbol_table.set(self.children[0], self.children[1])
+        
 class Identifier(Node):
     def __init__(self, value):
         super().__init__(value, [])
@@ -28,24 +44,22 @@ class Print(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        # print("evaluate do print: ", self.children[0].value)
-        
         if isinstance(self.children[0], int):
             result = self.children[0]
             if result != None:
-                print(result)
+                print(result[1])
 
         else:
             result = self.children[0].evaluate(symbol_table)
             if result != None:
-                print(result)
+                print(result[1])
 
 class If(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        if self.children[0].evaluate(symbol_table):
+        if self.children[0].evaluate(symbol_table)[1]:
             self.children[1].evaluate(symbol_table)
 
 class Else(Node):
@@ -53,69 +67,84 @@ class Else(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table): 
-        if self.children[0].evaluate(symbol_table):
-            self.children[1].evaluate(symbol_table)
+        if self.children[0].evaluate(symbol_table)[1]:
+            self.children[1].evaluate(symbol_table)[1]
         else:
             self.children[2].evaluate(symbol_table)
 
 class For(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
-
+        
     def evaluate(self, symbol_table):
 
         self.children[0].evaluate(symbol_table)
-        while self.children[1].evaluate(symbol_table):
+        while self.children[1].evaluate(symbol_table)[1]:
+            
             self.children[3].evaluate(symbol_table)
             self.children[2].evaluate(symbol_table)
 
-class Assignment(Node):
+class Type(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        if self.children[1] is not None:
-            value = self.children[1].evaluate(symbol_table)
-            symbol_table.set(self.children[0], value)
-            
-        else: 
-            symbol_table.set(self.children[0], self.children[1])
-        
+        return self.value
+
+class VarDec(Node):
+    def __init__(self, value, children):
+        super().__init__(value, children)
+
+    def evaluate(self, symbol_table):
+        return(self.children[0].value, self.children[1].evaluate(symbol_table))
+
 class IntVal(Node):
     def __init__(self, value):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
-        return self.value
+        return ("int", self.value)
 
 class BinOp(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-
         child_0 = self.children[0].evaluate(symbol_table)
         child_1 = self.children[1].evaluate(symbol_table)
 
         if child_0 != None and child_1 != None:
             if self.value == "+":
-                return child_0 + child_1
+                return ("int", child_0[1] + child_1[1])
             if self.value == "-":
-                return child_0 - child_1
+                return ("int", child_0[1] - child_1[1])
             if self.value == "*":
-                return child_0 * child_1
+                return ("int", child_0[1] * child_1[1])
             if self.value == "/":
-                return child_0 // child_1
+                return ("int", child_0[1] // child_1[1])
+            #because of go, we return 1 or 0 for booleans
             if self.value == '||':
-                return child_0 or child_1
+                if child_0[1] or child_1[1]:
+                    return ("int", 1)
+                else: return ("int", 0)
             if self.value == "&&":
-                return child_0 and child_1
+                if child_0[1] and child_1[1]:
+                    return ("int", 1)
+                else: return ("int", 0)
             if self.value == "==":
-                return (child_0 == child_1)
+                if (child_0[1] == child_1[1]):
+                    return ("int", 1)
+                else: return ("int", 0) 
             if self.value == ">":
-                return child_0 > child_1
+                if child_0[1] > child_1[1]:
+                    return ("int", 1)
+                else: return ("int", 0)
             if self.value == "<":
-                return child_0 < child_1
+                if child_0[1] < child_1[1]:
+                    return ("int", 1)
+                else: return ("int", 0)
+            if self.value == ".":
+                return ("str", str(child_0[1]) + str(child_1[1]))
 
 class UnOp(Node):
     def __init__(self, value, children):
@@ -123,13 +152,13 @@ class UnOp(Node):
 
     def evaluate(self, symbol_table):
         if self.value == "+":
-            return self.children[0].evaluate(symbol_table)
+            return ("int", self.children[0].evaluate(symbol_table)[1])
 
         if self.value == "-":
-            return -self.children[0].evaluate(symbol_table)
+            return ("int", -self.children[0].evaluate(symbol_table)[1])
         
         if self.value == "!":
-            return not self.children[0]
+            return ("int",  not self.children[0])
 
 class NoOp(Node):
     def __init__(self):

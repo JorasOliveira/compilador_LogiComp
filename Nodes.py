@@ -25,12 +25,15 @@ class Assignment(Node):
 
     def evaluate(self, symbol_table):
         if self.children[1] is not None:
+            # print("atempting to put:", self.children[0], self.children[1].value)
             node = self.children[1].evaluate(symbol_table)
+            # print("atempting to put in symbol table: ",self.children[0], node[0], node[1])
 
             symbol_table.set(self.children[0], node[0], node[1])
             
         else: 
-            symbol_table.set(self.children[0], self.children[1])
+            # print("atempting to put (child[1] is none?):", self.value, self.children)
+            symbol_table.set(self.children[0], self.value, self.children[1])
         
 class Identifier(Node):
     def __init__(self, value):
@@ -96,7 +99,8 @@ class VarDec(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        return(self.children[0].value, self.children[1].evaluate(symbol_table))
+        # print("varDec Node: ", self.value, self.children)
+        return(self.children[0], self.children[1].evaluate(symbol_table))
 
 class IntVal(Node):
     def __init__(self, value):
@@ -104,7 +108,14 @@ class IntVal(Node):
 
     def evaluate(self, symbol_table):
         return ("int", self.value)
+    
+class StrVal(Node):
+    def __init__(self, value):
+        super().__init__(value, [])
 
+    def evaluate(self, symbol_table):
+        return ("str", self.value)
+    
 class BinOp(Node):
     def __init__(self, value, children):
         super().__init__(value, children)

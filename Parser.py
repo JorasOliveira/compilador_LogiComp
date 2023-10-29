@@ -37,9 +37,10 @@ class Parser:
                     return result
         
     def parse_statement(tokenizer):
-        
         while tokenizer.next.type == "newline":
             tokenizer.select_next()
+
+        # print("in parse statment: ", tokenizer.next.value, tokenizer.next.type)
         
         if tokenizer.next.type == "identifier":
             identifier = Parser.parse_assingment(tokenizer)
@@ -85,39 +86,41 @@ class Parser:
         
         elif tokenizer.next.type == "varDec":
             tokenizer.select_next()
-            identifier = Parser.parse_assingment(tokenizer)       
+            identifier =  Nodes.Identifier(tokenizer.next.value) 
+            tokenizer.select_next() 
 
             if tokenizer.next.type == "type":
-                type = Nodes.Type(tokenizer.value, []) #oque eu faco com isso??
+                type = Nodes.Type(tokenizer.next.value, []) #oque eu faco com isso??
                 tokenizer.select_next()
                 
                 if tokenizer.next.value == "=":
                     tokenizer.select_next()
                     value = Parser.bool_expression(tokenizer)
-                    return Nodes.VarDec(identifier, value)
+                    assingment = Nodes.Assignment(identifier.value, [identifier.value, value])
+                    return Nodes.VarDec(identifier.value, [identifier.value, assingment])
 
-        elif (tokenizer.next.value in ["{", "}"]) or isinstance(tokenizer.next.value, int): raise Exception("incorrect sintax")
+        elif (tokenizer.next.value in ["{", "}"]): raise Exception("incorrect sintax")
 
     def parse_assingment(tokenizer):
         if tokenizer.next.type == "identifier":
             identifier = Nodes.Identifier(tokenizer.next.value)
             tokenizer.select_next()
-            
-
+        
             if tokenizer.next.value == "=":
                 tokenizer.select_next()
                 symbol = Parser.bool_expression(tokenizer)
-                return Nodes.Assignment(identifier, [identifier.value, symbol])
+                return Nodes.Assignment(identifier.value, [identifier.value, symbol])
             
         raise Exception("incorrect sintax")
 
     def parse_factor(tokenizer):
         result = 0
 
-        if tokenizer.next.type == "String":
-            return Nodes.VarDec("String", [tokenizer.next.value])
+        if tokenizer.next.type == "str":
+            str = tokenizer.next.value
             tokenizer.select_next()
-
+            return Nodes.StrVal(str)
+            
         if tokenizer.next.type == "operator":
             
             if tokenizer.next.value == "+":
@@ -156,7 +159,6 @@ class Parser:
                 return result
 
             # raise Exception("Unbalanced parentheses: '(' without ')'")
-
 
         elif tokenizer.next.type == "number" or tokenizer.next.type == "identifier":
 

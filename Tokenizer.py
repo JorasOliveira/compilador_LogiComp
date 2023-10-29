@@ -7,12 +7,13 @@ class Tokenizer:
         self.open_parentheses_count = 0  # Keep track of open parentheses
 
     def select_next(self):
-        #TODO -> "string", lidar com isso corretamente
         if self.position < len(self.source):
-            # print(self.source[self.position])
+            
             while self.source[self.position] in [" ", "\t"] and self.position < len(self.source): #passes white space
                 self.position += 1
 
+            # print("tokenizer: ", self.source[self.position])
+            
             if self.source[self.position] in ["+", "-", "*", "/", "<", ">", "!", "=", "|", "&", "."]: #tokenizes operators
 
                 if self.source[self.position + 1] in ["=", "|", "&"]:
@@ -35,10 +36,11 @@ class Tokenizer:
                     
             elif self.source[self.position].isalpha(): #tokenizes variable names
                 end_index = self.position
-                while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "=", " ", "\n"]):
+                while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "=", " ", "\n", "."]): 
                     end_index += 1
 
                 identifier_str = self.source[self.position : end_index]
+                # print("identifier_str: ", identifier_str)
                 self.position = end_index
 
                 if identifier_str == "Println":
@@ -70,7 +72,18 @@ class Tokenizer:
 
                 else:    
                     self.next = Token.Token("identifier", identifier_str)
-                    
+
+            
+            elif self.source[self.position] == '"': #tokenizes strings
+                end_index = self.position + 1
+                
+                while (self.source[end_index] not in ['"', "\n"]):
+                    end_index += 1
+                
+                str = self.source[self.position +1 : end_index]
+                self.position = end_index + 1
+                self.next = Token.Token("str", str)
+
             #the next few are self explenatory, tokenizes the specied token
             elif self.source[self.position] == ";":
                 self.next = Token.Token("semicolon", self.source[self.position])

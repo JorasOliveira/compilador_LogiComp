@@ -85,19 +85,27 @@ class Parser:
                     return Nodes.For("For", [assingment, expression, assingment2, block])
         
         elif tokenizer.next.type == "varDec":
+            # print("in varDec")
             tokenizer.select_next()
             identifier =  Nodes.Identifier(tokenizer.next.value) 
             tokenizer.select_next() 
 
+            if isinstance(identifier.value, int) or isinstance(identifier.value, float):
+                raise Exception("Syntax Error")
+
             if tokenizer.next.type == "type":
-                type = Nodes.Type(tokenizer.next.value, []) #oque eu faco com isso??
+                type = Nodes.Type(tokenizer.next.value, []) 
                 tokenizer.select_next()
                 
                 if tokenizer.next.value == "=":
                     tokenizer.select_next()
                     value = Parser.bool_expression(tokenizer)
-                    assingment = Nodes.Assignment(identifier.value, [identifier.value, value])
-                    return Nodes.VarDec(identifier.value, [identifier.value, assingment])
+                    
+                    # assingment = Nodes.Assignment(identifier.value, [identifier.value, value])
+                    return Nodes.VarDec(type, [identifier, value])
+                
+                # assingment = Nodes.Assignment(identifier.value, [identifier.value, None])
+                return Nodes.VarDec(type, [identifier, None])
 
         elif (tokenizer.next.value in ["{", "}"]): raise Exception("incorrect sintax")
 
@@ -109,6 +117,7 @@ class Parser:
             if tokenizer.next.value == "=":
                 tokenizer.select_next()
                 symbol = Parser.bool_expression(tokenizer)
+                # print("symbol: ", symbol)
                 return Nodes.Assignment(identifier.value, [identifier.value, symbol])
             
         raise Exception("incorrect sintax")
@@ -116,7 +125,7 @@ class Parser:
     def parse_factor(tokenizer):
         result = 0
 
-        if tokenizer.next.type == "str":
+        if tokenizer.next.type == "string":
             str = tokenizer.next.value
             tokenizer.select_next()
             return Nodes.StrVal(str)

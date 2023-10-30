@@ -75,14 +75,18 @@ class Tokenizer:
 
             
             elif self.source[self.position] == '"': #tokenizes strings
-                end_index = self.position + 1
+                end_index = self.position +1
                 
                 while (self.source[end_index] not in ['"', "\n"]):
                     end_index += 1
                 
-                str = self.source[self.position +1 : end_index]
+                str = self.source[self.position : end_index].replace('"', '')
                 self.position = end_index + 1
-                self.next = Token.Token("str", str)
+
+                if self.source[end_index] != '"':
+                    raise Exception("Invalid string")
+
+                self.next = Token.Token("string", str)
 
             #the next few are self explenatory, tokenizes the specied token
             elif self.source[self.position] == ";":

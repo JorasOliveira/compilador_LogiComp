@@ -19,3 +19,7 @@ class SymbolTable:
         
         else:
             raise KeyError(f"Identifier '{identifier}' not found in the symbol table.")
+    
+    def isIn(self, identifier):
+        identifier = identifier.strip()
+        return identifier in self.table

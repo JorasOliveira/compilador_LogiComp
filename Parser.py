@@ -34,6 +34,9 @@ class Parser:
 
                 if tokenizer.next.value == "}":
                     tokenizer.select_next()
+                    print("next: ", tokenizer.next.value)
+                    if ((tokenizer.next.value) != "\n") and (tokenizer.next.type != "else"):
+                        raise Exception("incorrect sintax")
                     return result
         
     def parse_statement(tokenizer):

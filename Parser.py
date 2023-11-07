@@ -105,7 +105,7 @@ class Parser:
                 
                 return Nodes.VarDec(type, [identifier, None])
 
-        elif (tokenizer.next.value in ["{", "}"]): raise Exception("incorrect sintax")
+        # elif (tokenizer.next.value in ["{", "}"]): raise Exception("incorrect sintax")
 
     def parse_assingment(tokenizer):
         if tokenizer.next.type == "identifier":

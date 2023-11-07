@@ -1,13 +1,15 @@
 class SymbolTable:
     def __init__(self):
         self.table = {}
+        self.ebp = 0
 
-    def set(self, identifier, type, node):
+    def set(self, identifier, type, node, ebp):
         identifier = identifier.strip()
         if identifier == "Println":
             raise Exception("Incorrect Sintax")
         
-        self.table[identifier] = (type, node)
+        self.ebp = ebp
+        self.table[identifier] = (type, node,)
 
     def get(self, identifier):
 
@@ -19,6 +21,9 @@ class SymbolTable:
         
         else:
             raise KeyError(f"Identifier '{identifier}' not found in the symbol table.")
+        
+    def get_ebp(self):
+        return self.ebp
     
     def isIn(self, identifier):
         identifier = identifier.strip()

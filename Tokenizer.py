@@ -12,7 +12,7 @@ class Tokenizer:
             while self.source[self.position] in [" ", "\t"] and self.position < len(self.source): #passes white space
                 self.position += 1
 
-            # print("tokenizer: ", self.source[self.position])
+            print("tokenizer: ", self.source[self.position])
             
             if self.source[self.position] in ["+", "-", "*", "/", "<", ">", "!", "=", "|", "&", "."]: #tokenizes operators
 

@@ -42,8 +42,6 @@ class Parser:
     def parse_statement(tokenizer):
         while tokenizer.next.type == "newline":
             tokenizer.select_next()
-
-        # print("in parse statment: ", tokenizer.next.value, tokenizer.next.type)
         
         if tokenizer.next.type == "identifier":
             identifier = Parser.parse_assingment(tokenizer)
@@ -88,7 +86,6 @@ class Parser:
                     return Nodes.For("For", [assingment, expression, assingment2, block])
         
         elif tokenizer.next.type == "varDec":
-            # print("in varDec")
             tokenizer.select_next()
             identifier =  Nodes.Identifier(tokenizer.next.value) 
             tokenizer.select_next() 
@@ -104,10 +101,8 @@ class Parser:
                     tokenizer.select_next()
                     value = Parser.bool_expression(tokenizer)
                     
-                    # assingment = Nodes.Assignment(identifier.value, [identifier.value, value])
                     return Nodes.VarDec(type, [identifier, value])
                 
-                # assingment = Nodes.Assignment(identifier.value, [identifier.value, None])
                 return Nodes.VarDec(type, [identifier, None])
 
         elif (tokenizer.next.value in ["{", "}"]): raise Exception("incorrect sintax")
@@ -120,7 +115,6 @@ class Parser:
             if tokenizer.next.value == "=":
                 tokenizer.select_next()
                 symbol = Parser.bool_expression(tokenizer)
-                # print("symbol: ", symbol)
                 return Nodes.Assignment(identifier.value, [identifier.value, symbol])
             
         raise Exception("incorrect sintax")
@@ -160,17 +154,20 @@ class Parser:
         
         if tokenizer.next.type == "scanln":
             tokenizer.select_next()
-            if tokenizer.next.type == "open_par":
-                result = input()
-                result = Nodes.IntVal(int(result))
 
+            result = Nodes.ScanLn("ScanLn")
             tokenizer.select_next()
+            tokenizer.select_next()
+            return result
+            # if tokenizer.next.type == "open_par":
+            #     result = input()
+            #     result = Nodes.IntVal(int(result))
 
-            if tokenizer.next.type == "close_par":
-                tokenizer.select_next()
-                return result
+            # tokenizer.select_next()
 
-            # raise Exception("Unbalanced parentheses: '(' without ')'")
+            # if tokenizer.next.type == "close_par":
+            #     tokenizer.select_next()
+            #     return result
 
         elif tokenizer.next.type == "number" or tokenizer.next.type == "identifier":
 
@@ -242,3 +239,4 @@ class Parser:
             raise Exception("incorrect number of parentheses")
 
         return result
+    

@@ -295,12 +295,12 @@ def header():
     f = open("header.txt", "r")
     h = f.read()
     f.close()
-    f = open("program.asm", "w")
+    f = open("teste1.asm", "w")
     f.write(h)
     f.close()
 
 def writter(code):
-    f = open("program.asm", "a")
+    f = open("teste1.asm", "a")
     f.write(code)
     f.close()
 
@@ -308,6 +308,6 @@ def footer():
     f = open("footer.txt", "r")
     h = f.read()
     f.close()
-    f = open("program.asm", "a")
+    f = open("teste1.asm", "a")
     f.write(h)
     f.close()

@@ -14,6 +14,8 @@ formatout: db "%d", 10, 0 ; newline, nul terminator
 scanint: times 4 db 0 ; 32-bits integer = 4 bytes
 
 segment .bss  ; variaveis
+extern fflush
+extern stdout
 res RESB 1
 
 section .text

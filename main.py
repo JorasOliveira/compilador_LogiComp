@@ -7,7 +7,6 @@ from SymbolTable import SymbolTable
 
 def main():
     code = read_file(sys.argv[1])
-    print(code)
     symbol_table = SymbolTable()
     Parser.run(code).evaluate(symbol_table)
 

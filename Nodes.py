@@ -1,4 +1,9 @@
 from SymbolTable import SymbolTable
+import Nodes
+
+funcTable = SymbolTable()
+
+# main_call = 0
 
 class Node:
     def __init__(self, value, children):
@@ -6,7 +11,6 @@ class Node:
         self.children = children  # list of Node
 
     def evaluate(self, symbol_table):
-        # print("evaluating node: ", self.value, self.children)
         return self.value
         
 class Block(Node):
@@ -14,41 +18,156 @@ class Block(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+        # print("self.children: ", self.children)
+        # print("children of type: ", self.children[-1].value)
+        if_funcDec = self.children[-1].value
+
+        # table = SymbolTable()
+
         for child in self.children:
-            child.evaluate(symbol_table)
+            # print("about to evaluate: ", child.value)
+            if child.value == "Return":
+                result = child.evaluate(symbol_table)
+                # print("return evaluates to: ", result)
+                return result
+            else: child.evaluate(symbol_table)
+
+        if if_funcDec == "FuncDec":
+            main = self.children[-1].children[0].children[0].value
+
+            if main != "main":
+                raise Exception("ERROR: No main function")
+            else: Nodes.FuncCall("main", ["main",[]]).evaluate(symbol_table)
 
 class Assignment(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+        # print("assingment: ", self.children)
         if self.children[1] is not None:
+            # print("assingment.children: ", self.children[1])
             node = self.children[1].evaluate(symbol_table)
-            # print("atempting to put in symbol table: ",self.children[0], node[0], node[1]) 
-            # print(symbol_table.get(self.children[0]))
+            # print("just evaluated: ", self.children[1])
+            # print("node: ", node) 
 
-            if (isinstance(symbol_table.get(self.children[0])[0], Type)):
-                if (symbol_table.get(self.children[0])[0].value != node[0]):
-                    raise Exception("Wrong Type")
+            if node is not None:
+                # print("atempting to put in symbol table: ",self.children[0], node[0], node[1]) 
+                # print(symbol_table.get(self.children[0]))
+
+                if (isinstance(symbol_table.get(self.children[0])[0], Type)):
+                    if (symbol_table.get(self.children[0])[0].value != node[0]):
+                        raise Exception("Wrong Type")
+                    
+                elif symbol_table.isIn(self.children[0]):
+                    if (symbol_table.get(self.children[0])[0] != node[0]):
+                        raise Exception("Wrong Type")
+
+                if node[0] == "int":
+                    if isinstance(node[1], str):
+                        raise Exception("Syntax Error")
+
+                if node[0] == "string":
+                    if isinstance(node[1], int) or isinstance(node[1], float):
+                        raise Exception("Syntax Error")
+
+                symbol_table.set(self.children[0], node[0], node[1])
                 
-            elif symbol_table.isIn(self.children[0]):
-                if (symbol_table.get(self.children[0])[0] != node[0]):
-                    raise Exception("Wrong Type")
+            else: 
+                print("atempting to put: ", self.value, self.children, " in symbol table")
+                symbol_table.set(self.children[0], "int", 7)
 
-            if node[0] == "int":
-                if isinstance(node[1], str):
-                    raise Exception("Syntax Error")
+#Nodes.FuncDec("FuncDec", [varDec, variables, block])
+class FuncDec(Node):
+    def __init__(self, value, children):
+        super().__init__(value, children)
+    
+    def evaluate(self, symbol_table):
+        # print("in funcDec")
+        name = self.children[0].children[0].value
+        type = self.children[0].value.value
+        node = self
 
-            if node[0] == "string":
-                if isinstance(node[1], int) or isinstance(node[1], float):
-                    raise Exception("Syntax Error")
+        # print("name: ", name)
+        # print("type: ", type)
+        # print("node: ", node)
 
-               
-            symbol_table.set(self.children[0], node[0], node[1])
+        funcTable.set(name, type, node)
+        # print("saved in func table: ",  name, funcTable.get(name))
+
+#Nodes.FuncCall(identifier.value, [identifier.value, assingments])
+#TODO -> parece que quando ele volta pro evaluate da main, ele comeca do comeco? e nao de onde parou??
+class FuncCall(Node):
+    def __init__(self, value, children):
+        super().__init__(value, children)
+
+    def evaluate(self, symbol_table):
+        # print("in funcCall")
+        # print("funcTable: ", self.value)
+        func = funcTable.get(self.value)
+        type = func[0]
+        dec = func[1]
+        varDec = dec.children[0]
+        children = dec.children[1]
+        block = dec.children[2]
+        # print("block inside funcCall: ", block.children)
+
+        # print("evaluating the FunDec children: ", children)
+        func_dec_child_names = []
+        for child in children:
+            func_dec_child_names.append(child.children[0].value)
+            child.evaluate(symbol_table)
+        # print("child_names: ", func_dec_child_names)
+
+        # print("evaluating my own children: ", self.children)
+        func_call_children = []
+        for child in self.children[1]:
+            func_call_children.append(child.children[1].evaluate(symbol_table))
+            # func_call_children.append(child.children[1].value)
+        # print(func_call_children)
+
+        if len(func_dec_child_names) != len(func_call_children):
+            raise Exception("Wrong number of arguments")
+        new_table = SymbolTable()
+        for i in range(len(func_call_children)):
             
+            # print("child:", func_dec_child_names[i], func_call_children[i][0], func_call_children[i][1])
+            # funcTable.set(func_dec_child_names[i], func_call_children[i][0], func_call_children[i][1])
+            new_table.set(func_dec_child_names[i], func_call_children[i][0], func_call_children[i][1])
+
+
+        # print("debug func_table: ", funcTable.table)
+        # print("debug symbol_table: ", symbol_table.table)
+        # print("debug new_table: ", new_table.table)
+
+
+        #TODO - mudar para corretamente checar os tipos
+        # for i in range(len(func_dec_child_names)):
+        #     if func_dec_child_names[i] != func_call_child_names[i]:
+        #         raise Exception("Wrong argument type")
+
+        if self.value == 'main':
+            block.evaluate(symbol_table)
+
         else: 
-            #print("atempting to put (child[1] is none?):", self.value, self.children)
-            symbol_table.set(self.children[0], self.value, self.children[1])
+            result = block.evaluate(new_table)
+            # print("debug func_table: ", funcTable.table)
+            # print("debug symbol_table: ", symbol_table.table)
+            # print("debug new_table: ", new_table.table)
+            # print("funcCall result: ", result)
+            return result
+            
+
+class Return(Node):
+    def __init__(self, value, children):
+        super().__init__(value, children)
+
+    def evaluate(self, symbol_table):
+        # print("in return")
+        # print("children: ", self.children[0].value)
+        # print("retuning: ", self.children[0].evaluate(symbol_table))
+        return self.children[0].evaluate(symbol_table)
+
         
 class Identifier(Node):
     def __init__(self, value):
@@ -77,6 +196,7 @@ class If(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+
         if self.children[0].evaluate(symbol_table)[1]:
             self.children[1].evaluate(symbol_table)
 
@@ -95,7 +215,6 @@ class For(Node):
         super().__init__(value, children)
         
     def evaluate(self, symbol_table):
-
         self.children[0].evaluate(symbol_table)
         while self.children[1].evaluate(symbol_table)[1]:
             
@@ -109,7 +228,6 @@ class Type(Node):
     def evaluate(self, symbol_table):
         return self.value
 
-#TODO-> mudar para funcionar como o assignment, fazer a checagem de tipos e garantir que esta colocando o tipo corretamente na symbol table
 class VarDec(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
@@ -135,7 +253,7 @@ class VarDec(Node):
             symbol_table.set(self.children[0].value, self.value, node[1])
             
         else: 
-            # print("atempting to put (child[1] is none):", self.value.value, self.children[0].value)
+            # print("atempting to put: ", self.value.value, self.children[0].value, " in symbol table")
             symbol_table.set(self.children[0].value, self.value.value, self.children[0].value)
 
         # return(self.children[0].value, self.children[1].evaluate(symbol_table))
@@ -159,6 +277,8 @@ class BinOp(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
+        # print(self.children)
+        # print(self.children[0])
         child_0 = self.children[0].evaluate(symbol_table)
         child_1 = self.children[1].evaluate(symbol_table)
 
@@ -167,7 +287,7 @@ class BinOp(Node):
         if isinstance(child_0[0], Type):
             child_0 = list(child_0)
             child_0[0] = child_0[0].evaluate(symbol_table)
-            if child_0[0] is 'i':
+            if child_0[0] == 'i':
                 child_0[0] = "int"
 
             child_0 = tuple(child_0)

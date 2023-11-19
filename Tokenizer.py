@@ -36,7 +36,7 @@ class Tokenizer:
                     
             elif self.source[self.position].isalpha(): #tokenizes variable names
                 end_index = self.position
-                while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "=", " ", "\n", "."]): 
+                while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "=", " ", "\n", ".", ",", ";", "{", "}", "<", ">", "!", "|", "&", '"', "\t"]): 
                     end_index += 1
 
                 identifier_str = self.source[self.position : end_index]
@@ -51,6 +51,12 @@ class Tokenizer:
                 
                 elif identifier_str == "var":
                     self.next = Token.Token("varDec", identifier_str)
+
+                elif identifier_str == "func":
+                    self.next = Token.Token("func", identifier_str)
+
+                elif identifier_str == "return":
+                    self.next = Token.Token("return", identifier_str)
                 
                 elif identifier_str == "int":
                     self.next = Token.Token("type", identifier_str)
@@ -89,6 +95,10 @@ class Tokenizer:
                 self.next = Token.Token("string", str)
 
             #the next few are self explenatory, tokenizes the specied token
+            elif self.source[self.position] == ",":
+                self.next = Token.Token("comma", self.source[self.position])
+                self.position += 1
+
             elif self.source[self.position] == ";":
                 self.next = Token.Token("semicolon", self.source[self.position])
                 self.position += 1

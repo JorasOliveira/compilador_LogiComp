@@ -2,11 +2,12 @@ import Tokenizer
 import Nodes
 
 class Parser:
-    def parse_program(tokenizer):
+    def parse_program(tokenizer): #criar o check pra ver se tem a main
         result = Nodes.Block("Block",[])
         
         while tokenizer.next.type != "none":
-            thing = Parser.parse_statement(tokenizer)
+            thing = Parser.parse_declaration(tokenizer)
+            # print("thing: ", thing)
 
             if thing != None:
                 result.children.append(thing)
@@ -15,8 +16,59 @@ class Parser:
             
         return result
     
+    def parse_declaration(tokenizer):
+        # print("in parse declaration: ", tokenizer.next.value, tokenizer.next.type)
+
+        if tokenizer.next.type == "func":
+            tokenizer.select_next()
+
+            if tokenizer.next.type == "identifier":
+                identifier = Nodes.Identifier(tokenizer.next.value)
+                tokenizer.select_next()
+
+                if tokenizer.next.type == "open_par":
+                    tokenizer.select_next()
+                    variables = []
+
+                    #if we have parameters
+                    if tokenizer.next.type == "identifier":
+                        identifier2 = Nodes.Identifier(tokenizer.next.value)
+                        tokenizer.select_next()
+                        type = Nodes.Type(tokenizer.next.value, [])
+                        tokenizer.select_next()
+                        
+                        variables.append(Nodes.VarDec(type, [identifier2, None]))
+
+                        if tokenizer.next.type == "comma":
+                            
+                            while tokenizer.next.type == "comma":
+                                tokenizer.select_next()
+                                identifier2 = Nodes.Identifier(tokenizer.next.value)
+                                tokenizer.select_next()
+                                type = Nodes.Type(tokenizer.next.value, [])
+                                tokenizer.select_next()
+                                variables.append(Nodes.VarDec(type, [identifier2, None]))
+                    
+                if tokenizer.next.type == "close_par": 
+                    tokenizer.select_next()
+                    type = Nodes.Type(tokenizer.next.value, [])
+                    tokenizer.select_next()
+                    varDec = Nodes.VarDec(type, [identifier, None])
+                    
+                    block = Parser.parse_block(tokenizer)
+                    # tokenizer.select_next()
+
+                if tokenizer.next.type == "newline":
+                    # tokenizer.select_next()
+                    # print("in parser, FuncDec: ", varDec.children[0].value)
+                    return Nodes.FuncDec("FuncDec", [varDec, variables, block])
+                
+                raise Exception("Error")
+                    
     def parse_block(tokenizer):
         result = Nodes.Block("Block",[])
+        # print("in block")
+        # print("next token is: ", tokenizer.next.value, tokenizer.next.type)
 
         if tokenizer.next.value == "{":
             tokenizer.select_next()
@@ -60,7 +112,7 @@ class Parser:
                     tokenizer.select_next()
                     return Nodes.Print("Println", [expression])
                    
-        elif tokenizer.next.value == "if":
+        elif tokenizer.next.type == "if":
            
             tokenizer.select_next()
             expression = Parser.bool_expression(tokenizer)
@@ -73,22 +125,27 @@ class Parser:
                 
             return Nodes.If("If", [expression, block])
                 
-        elif tokenizer.next.value == "for":
+        elif tokenizer.next.type == "for":
             tokenizer.select_next()
             assingment = Parser.parse_assingment(tokenizer)
 
             if tokenizer.next.type == "semicolon":
                 tokenizer.select_next()
-                expression = Parser.bool_expression(tokenizer)
+                expression = Parser.bool_expression(tokenizer) 
 
                 if tokenizer.next.type == "semicolon":
                     tokenizer.select_next()
+
                     assingment2 = Parser.parse_assingment(tokenizer)
                     block = Parser.parse_block(tokenizer)
                     return Nodes.For("For", [assingment, expression, assingment2, block])
+                
+        elif tokenizer.next.type == "return":
+            tokenizer.select_next()
+            expression = Parser.bool_expression(tokenizer)
+            return Nodes.Return("Return", [expression])
         
         elif tokenizer.next.type == "varDec":
-            # print("in varDec")
             tokenizer.select_next()
             identifier =  Nodes.Identifier(tokenizer.next.value) 
             tokenizer.select_next() 
@@ -113,6 +170,7 @@ class Parser:
         elif (tokenizer.next.value in ["{", "}"]): raise Exception("incorrect sintax")
 
     def parse_assingment(tokenizer):
+        # print("in parse assigmet, next token is: ", tokenizer.next.value)
         if tokenizer.next.type == "identifier":
             identifier = Nodes.Identifier(tokenizer.next.value)
             tokenizer.select_next()
@@ -120,8 +178,24 @@ class Parser:
             if tokenizer.next.value == "=":
                 tokenizer.select_next()
                 symbol = Parser.bool_expression(tokenizer)
-                # print("symbol: ", symbol)
                 return Nodes.Assignment(identifier.value, [identifier.value, symbol])
+            
+            elif tokenizer.next.type == "open_par":
+                tokenizer.select_next()
+                symbol = Parser.bool_expression(tokenizer)
+                assingments = []
+                assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+     
+                if tokenizer.next.type == "comma":
+                    
+                    while tokenizer.next.type == "comma":
+                        tokenizer.select_next()
+                        symbol = Parser.bool_expression(tokenizer)
+                        assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+
+                return Nodes.FuncCall(identifier.value, [identifier.value, assingments])
+            
+            return identifier
             
         raise Exception("incorrect sintax")
 
@@ -132,8 +206,29 @@ class Parser:
             str = tokenizer.next.value
             tokenizer.select_next()
             return Nodes.StrVal(str)
+        
+        if tokenizer.next.type == "identifier":
+            identifier = Nodes.Identifier(tokenizer.next.value)
+            tokenizer.select_next()
+        
+            if tokenizer.next.type == "open_par":
+                tokenizer.select_next()
+                symbol = Parser.bool_expression(tokenizer)
+                assingments = []
+                assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+        
+                if tokenizer.next.type == "comma":
+                    
+                    while tokenizer.next.type == "comma":
+                        tokenizer.select_next()
+                        symbol = Parser.bool_expression(tokenizer)
+                        assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+
+                return Nodes.FuncCall(identifier.value, [identifier.value, assingments])
             
-        if tokenizer.next.type == "operator":
+            return identifier
+            
+        elif tokenizer.next.type == "operator":
             
             if tokenizer.next.value == "+":
                 unit_op = Nodes.UnOp("+", [])
@@ -148,7 +243,7 @@ class Parser:
             unit_op.children.append(Parser.parse_factor(tokenizer))
             return unit_op
 
-        if tokenizer.next.type == "open_par":
+        elif tokenizer.next.type == "open_par":
             tokenizer.select_next()
             result = Parser.bool_expression(tokenizer)
 
@@ -158,7 +253,7 @@ class Parser:
 
             raise Exception("Unbalanced parentheses: '(' without ')'")
         
-        if tokenizer.next.type == "scanln":
+        elif tokenizer.next.type == "scanln":
             tokenizer.select_next()
             if tokenizer.next.type == "open_par":
                 result = input()
@@ -170,9 +265,7 @@ class Parser:
                 tokenizer.select_next()
                 return result
 
-            # raise Exception("Unbalanced parentheses: '(' without ')'")
-
-        elif tokenizer.next.type == "number" or tokenizer.next.type == "identifier":
+        if tokenizer.next.type == "number" or tokenizer.next.type == "identifier":
 
             if tokenizer.next.type == "identifier":
                 node = Nodes.Identifier(tokenizer.next.value)
@@ -180,6 +273,7 @@ class Parser:
             else: node = Nodes.IntVal(tokenizer.next.value)
 
             tokenizer.select_next()
+
             if (tokenizer.next.value.isalpha()): raise Exception("incorrect sintax")
             return node
 

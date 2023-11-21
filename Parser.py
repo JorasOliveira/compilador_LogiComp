@@ -160,14 +160,12 @@ class Parser:
                 if tokenizer.next.value == "=":
                     tokenizer.select_next()
                     value = Parser.bool_expression(tokenizer)
-                    
-                    # assingment = Nodes.Assignment(identifier.value, [identifier.value, value])
+        
                     return Nodes.VarDec(type, [identifier, value])
-                
-                # assingment = Nodes.Assignment(identifier.value, [identifier.value, None])
+            
                 return Nodes.VarDec(type, [identifier, None])
 
-        elif (tokenizer.next.value in ["{", "}"]): raise Exception("incorrect sintax")
+        # elif (tokenizer.next.value in ["{", "}"]): raise Exception("incorrect sintax")
 
     def parse_assingment(tokenizer):
         # print("in parse assigmet, next token is: ", tokenizer.next.value)
@@ -184,14 +182,14 @@ class Parser:
                 tokenizer.select_next()
                 symbol = Parser.bool_expression(tokenizer)
                 assingments = []
-                assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+                assingments.append(symbol)
      
                 if tokenizer.next.type == "comma":
                     
                     while tokenizer.next.type == "comma":
                         tokenizer.select_next()
                         symbol = Parser.bool_expression(tokenizer)
-                        assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+                        assingments.append(symbol)
 
                 return Nodes.FuncCall(identifier.value, [identifier.value, assingments])
             
@@ -200,8 +198,7 @@ class Parser:
         raise Exception("incorrect sintax")
 
     def parse_factor(tokenizer):
-        result = 0
-
+        result = 0 
         if tokenizer.next.type == "string":
             str = tokenizer.next.value
             tokenizer.select_next()
@@ -214,19 +211,25 @@ class Parser:
             if tokenizer.next.type == "open_par":
                 tokenizer.select_next()
                 symbol = Parser.bool_expression(tokenizer)
+                
                 assingments = []
-                assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+                # assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+                assingments.append(symbol)
         
                 if tokenizer.next.type == "comma":
                     
                     while tokenizer.next.type == "comma":
+                        # print("symbol: ", symbol)
                         tokenizer.select_next()
                         symbol = Parser.bool_expression(tokenizer)
-                        assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+                        # assingments.append(Nodes.Assignment(identifier.value, [identifier.value, symbol]))
+                        assingments.append(symbol)
 
-                return Nodes.FuncCall(identifier.value, [identifier.value, assingments])
+                if tokenizer.next.type == "close_par":
+                    tokenizer.select_next()
+                    return Nodes.FuncCall(identifier.value, [identifier.value, assingments])
             
-            return identifier
+            else: return identifier
             
         elif tokenizer.next.type == "operator":
             

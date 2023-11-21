@@ -22,13 +22,9 @@ class Block(Node):
         # print("children of type: ", self.children[-1].value)
         if_funcDec = self.children[-1].value
 
-        # table = SymbolTable()
-
         for child in self.children:
-            # print("about to evaluate: ", child.value)
             if child.value == "Return":
                 result = child.evaluate(symbol_table)
-                # print("return evaluates to: ", result)
                 return result
             else: child.evaluate(symbol_table)
 
@@ -74,7 +70,7 @@ class Assignment(Node):
                 symbol_table.set(self.children[0], node[0], node[1])
                 
             else: 
-                print("atempting to put: ", self.value, self.children, " in symbol table")
+                # print("atempting to put: ", self.value, self.children, " in symbol table")
                 symbol_table.set(self.children[0], "int", 7)
 
 #Nodes.FuncDec("FuncDec", [varDec, variables, block])
@@ -110,30 +106,40 @@ class FuncCall(Node):
         varDec = dec.children[0]
         children = dec.children[1]
         block = dec.children[2]
-        # print("block inside funcCall: ", block.children)
+
+        # print("evaluating my own children: ", self.children)
+        func_call_children = []
+        new_table = SymbolTable()
 
         # print("evaluating the FunDec children: ", children)
         func_dec_child_names = []
         for child in children:
+            # print("funcDec child:", child.children[0].value)
             func_dec_child_names.append(child.children[0].value)
-            child.evaluate(symbol_table)
+            child.evaluate(new_table)
         # print("child_names: ", func_dec_child_names)
 
-        # print("evaluating my own children: ", self.children)
-        func_call_children = []
         for child in self.children[1]:
-            func_call_children.append(child.children[1].evaluate(symbol_table))
-            # func_call_children.append(child.children[1].value)
-        # print(func_call_children)
+            # print("child: ", child)
 
-        if len(func_dec_child_names) != len(func_call_children):
-            raise Exception("Wrong number of arguments")
-        new_table = SymbolTable()
-        for i in range(len(func_call_children)):
-            
-            # print("child:", func_dec_child_names[i], func_call_children[i][0], func_call_children[i][1])
-            # funcTable.set(func_dec_child_names[i], func_call_children[i][0], func_call_children[i][1])
-            new_table.set(func_dec_child_names[i], func_call_children[i][0], func_call_children[i][1])
+            if isinstance(child, list) == "list":
+                func_call_children.append(child.children[1].evaluate(symbol_table))
+            elif child: 
+                func_call_children.append(child.evaluate(symbol_table))
+
+            # func_call_children.append(child.children[1].evaluate(symbol_table))
+            # func_call_children.append(child.children[1].value)
+            # print(func_call_children)
+
+        if func_call_children and children:
+
+            if len(func_dec_child_names) != len(func_call_children):
+                raise Exception("Wrong number of arguments")
+    
+            for i in range(len(func_call_children)):
+                # print("child:", func_dec_child_names[i], func_call_children[i][0], func_call_children[i][1])
+                # funcTable.set(func_dec_child_names[i], func_call_children[i][0], func_call_children[i][1])
+                new_table.set(func_dec_child_names[i], func_call_children[i][0], func_call_children[i][1])
 
 
         # print("debug func_table: ", funcTable.table)

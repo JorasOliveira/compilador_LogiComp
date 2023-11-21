@@ -87,6 +87,7 @@ class Parser:
                 if tokenizer.next.value == "}":
                     tokenizer.select_next()
                     # print("next in block: ", tokenizer.next.value)
+
                     if ((tokenizer.next.value) != "\n") and (tokenizer.next.type != "else"):
                         raise Exception("incorrect sintax")
                     
@@ -130,6 +131,10 @@ class Parser:
                 # print("next3: ", tokenizer.next.value)
                 block2 = Parser.parse_block(tokenizer)
                 # print("next4: ", tokenizer.next.value)
+                
+                if tokenizer.next.type == "else":
+                    raise Exception("incorrect sintax")
+
                 return Nodes.Else("else", [expression, block, block2]) 
                 
             return Nodes.If("If", [expression, block])

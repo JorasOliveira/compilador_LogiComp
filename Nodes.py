@@ -18,21 +18,22 @@ class Block(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        # print("self.children: ", self.children)
-        # print("children of type: ", self.children[-1].value)
         if_funcDec = self.children[-1].value
 
         for child in self.children:
-            if child.value == "Return":
-                result = child.evaluate(symbol_table)
+            
+
+            result = child.evaluate(symbol_table)
+            if child.value == "Return":   
                 return result
-            else: child.evaluate(symbol_table)
+            
 
         if if_funcDec == "FuncDec":
             main = self.children[-1].children[0].children[0].value
 
             if main != "main":
                 raise Exception("ERROR: No main function")
+            
             else: Nodes.FuncCall("main", ["main",[]]).evaluate(symbol_table)
 
 class Assignment(Node):
@@ -163,12 +164,15 @@ class FuncCall(Node):
                 if new_table.get(func_dec_child_names[i])[0] != type:
                     raise Exception("Wrong return type")
 
-        if self.value == 'main':
-            block.evaluate(symbol_table)
+        # if self.value == 'main':
+        #     block.evaluate(symbol_table)
 
-        else: 
-            result = block.evaluate(new_table)
-            return result
+        result = block.evaluate(new_table)
+        # print("result: ", result)
+        if result:
+            if type != result[0]:
+                raise Exception("Wrong return type")
+        return result
             
 
 class Return(Node):

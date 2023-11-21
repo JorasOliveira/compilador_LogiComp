@@ -86,9 +86,13 @@ class Parser:
 
                 if tokenizer.next.value == "}":
                     tokenizer.select_next()
-                    # print("next: ", tokenizer.next.value)
+                    # print("next in block: ", tokenizer.next.value)
                     if ((tokenizer.next.value) != "\n") and (tokenizer.next.type != "else"):
                         raise Exception("incorrect sintax")
+                    
+                    # elif ((tokenizer.next.value) == "\n"):
+                    #     raise Exception("incorrect sintax")
+                    
                     return result
         
     def parse_statement(tokenizer):
@@ -116,12 +120,17 @@ class Parser:
            
             tokenizer.select_next()
             expression = Parser.bool_expression(tokenizer)
+            # print("next1: ", tokenizer.next.value)
+            # print("expression: ", expression)
             block = Parser.parse_block(tokenizer)
+            # print("next2: ", tokenizer.next.value)
 
             if tokenizer.next.type == "else":
                 tokenizer.select_next()
+                # print("next3: ", tokenizer.next.value)
                 block2 = Parser.parse_block(tokenizer)
-                return Nodes.Else("else", [expression, block, block2])   
+                # print("next4: ", tokenizer.next.value)
+                return Nodes.Else("else", [expression, block, block2]) 
                 
             return Nodes.If("If", [expression, block])
                 
@@ -140,6 +149,8 @@ class Parser:
                     block = Parser.parse_block(tokenizer)
                     return Nodes.For("For", [assingment, expression, assingment2, block])
                 
+            else: raise Exception("incorrect sintax")
+
         elif tokenizer.next.type == "return":
             tokenizer.select_next()
             expression = Parser.bool_expression(tokenizer)

@@ -36,7 +36,7 @@ class Tokenizer:
                     
             elif self.source[self.position].isalpha(): #tokenizes variable names
                 end_index = self.position
-                while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "=", " ", "\n", ".", ",", ";", "{", "}", "<", ">", "!", "|", "&", '"', "\t"]): 
+                while (self.source[end_index] not in ["+", "-", "*", "/", "\n", "(", ")", "=", " ", ".", ",", ";", "{", "}", "<", ">", "!", "|", "&", '"', "\t"]):
                     end_index += 1
 
                 identifier_str = self.source[self.position : end_index]

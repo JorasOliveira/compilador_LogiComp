@@ -21,7 +21,7 @@ class Block(Node):
         if_funcDec = self.children[-1].value
 
         for child in self.children:
-            
+            # print("child: ", child.value)
 
             result = child.evaluate(symbol_table)
             if child.value == "Return":   

@@ -57,9 +57,15 @@ class Parser:
                     
                     block = Parser.parse_block(tokenizer)
                     # tokenizer.select_next()
+                   
 
                 if tokenizer.next.type == "newline":
-                    # tokenizer.select_next()
+                    tokenizer.select_next()
+                    # print("next token is: ", tokenizer.next.value, tokenizer.next.type)
+
+                    if tokenizer.next.type in ["open_bracket", "close_bracket"]:
+                        raise Exception("incorrect sintax")
+                    
                     # print("in parser, FuncDec: ", varDec.children[0].value)
                     return Nodes.FuncDec("FuncDec", [varDec, variables, block])
                 
@@ -69,9 +75,11 @@ class Parser:
         result = Nodes.Block("Block",[])
         # print("in block")
         # print("next token is: ", tokenizer.next.value, tokenizer.next.type)
+        
 
         if tokenizer.next.value == "{":
             tokenizer.select_next()
+            # bracket_count += 1
 
             if tokenizer.next.value == "\n":
                 tokenizer.select_next()
@@ -86,13 +94,11 @@ class Parser:
 
                 if tokenizer.next.value == "}":
                     tokenizer.select_next()
-                    # print("next in block: ", tokenizer.next.value)
+                    # print("next token is: ", tokenizer.next.value, tokenizer.next.type)
+                    # bracket_count -= 1
 
                     if ((tokenizer.next.value) != "\n") and (tokenizer.next.type != "else"):
                         raise Exception("incorrect sintax")
-                    
-                    # elif ((tokenizer.next.value) == "\n"):
-                    #     raise Exception("incorrect sintax")
                     
                     return result
         
@@ -124,14 +130,22 @@ class Parser:
             # print("next1: ", tokenizer.next.value)
             # print("expression: ", expression)
             block = Parser.parse_block(tokenizer)
-            # print("next2: ", tokenizer.next.value)
+            # print("next2: ", tokenizer.next.type, "auwbdiuawdbui")
+
+            if tokenizer.next.type == "newline":
+                tokenizer.select_next()
+
+                if tokenizer.next.type == "else":
+                    raise Exception("incorrect sintax")
 
             if tokenizer.next.type == "else":
                 tokenizer.select_next()
                 # print("next3: ", tokenizer.next.value)
                 block2 = Parser.parse_block(tokenizer)
-                # print("next4: ", tokenizer.next.value)
-                
+            
+                tokenizer.select_next()
+                # print("next4: ", tokenizer.next.type, "auwbdiuawdbui")
+
                 if tokenizer.next.type == "else":
                     raise Exception("incorrect sintax")
 
@@ -353,5 +367,5 @@ class Parser:
 
         if tokenizer.open_parentheses_count != 0:
             raise Exception("incorrect number of parentheses")
-
+        
         return result

@@ -145,7 +145,7 @@ class For(Node):
         print("id0: ", self.unique_id)
         loop_label = f"loop_{self.unique_id}"
         print("id1: ", self.unique_id)
-        end_loop = f"EXIT loop_{self.unique_id}"
+        end_loop = f"END loop_{self.unique_id}"
         print("id2: ", self.unique_id)
         writter(f"{loop_label}:\n")
 

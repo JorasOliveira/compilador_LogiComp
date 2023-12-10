@@ -119,9 +119,9 @@ class Else(Node):
             self.children[2].evaluate(symbol_table)
             writter("CALL binop_false\n")
 
-class For(Node):
-    def __init__(self, value, children):
-        super().__init__(value, children)
+# class For(Node):
+#     def __init__(self, value, children):
+#         super().__init__(value, children)
         
 #     def evaluate(self, symbol_table):
 
@@ -131,20 +131,29 @@ class For(Node):
 #             self.children[3].evaluate(symbol_table)
 #             self.children[2].evaluate(symbol_table)
 
+class For(Node):
+    def __init__(self, value, children):
+        super().__init__(value, children)
+        self.unique_id = For.next_id
+        For.next_id += 1
+
+    next_id = 0
+
     def evaluate(self, symbol_table):
-        self.children[0].evaluate(symbol_table)  
-        loop_label = f"loop_label{id(self)}"
-        end_loop = f"end_loop{id(self)}"
+        self.children[0].evaluate(symbol_table)
+        loop_label = f"loop_label{self.unique_id}"
+        end_loop = f"end_loop{self.unique_id}"
         writter(f"{loop_label}:\n")
 
         while self.children[1].evaluate(symbol_table)[1]:
             writter("CALL binop_je\n")
             writter(f"JMP {end_loop}\n")
             self.children[3].evaluate(symbol_table)
-            self.children[2].evaluate(symbol_table)  
+            self.children[2].evaluate(symbol_table)
             writter(f"JMP {loop_label}\n")
 
         writter(f"{end_loop}:\n")
+
 
 
 class Type(Node):

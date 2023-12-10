@@ -138,11 +138,15 @@ class For(Node):
         For.next_id += 1
 
     next_id = 0
+    
 
     def evaluate(self, symbol_table):
         self.children[0].evaluate(symbol_table)
-        loop_label = f"loop_label{self.unique_id}"
-        end_loop = f"end_loop{self.unique_id}"
+        print("id0: ", self.unique_id)
+        loop_label = f"loop_{self.unique_id}"
+        print("id1: ", self.unique_id)
+        end_loop = f"EXIT loop_{self.unique_id}"
+        print("id2: ", self.unique_id)
         writter(f"{loop_label}:\n")
 
         while self.children[1].evaluate(symbol_table)[1]:

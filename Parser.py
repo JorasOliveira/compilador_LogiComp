@@ -40,6 +40,7 @@ class Parser:
                     return result
         
     def parse_statement(tokenizer):
+        print("next: ", tokenizer.next.value)
         while tokenizer.next.type == "newline":
             tokenizer.select_next()
         

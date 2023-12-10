@@ -95,8 +95,17 @@ class If(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        if self.children[0].evaluate(symbol_table)[1]:
+
+        condition = self.children[0].evaluate(symbol_table)
+        # writter("CMP EAX, False; Evaluate do If\n")
+
+        if condition[1]:
             self.children[1].evaluate(symbol_table)
+            writter("CALL binop_true\n")
+            return
+            #writter("JMP end_if ; Jump pro final do if\n")
+        writter("CALL binop_false\n")
+        #writter("end_if: ; Fim do if\n")
 
 class Else(Node):
     def __init__(self, value, children):
@@ -105,20 +114,38 @@ class Else(Node):
     def evaluate(self, symbol_table): 
         if self.children[0].evaluate(symbol_table)[1]:
             self.children[1].evaluate(symbol_table)[1]
+            writter("CALL binop_true\n")
         else:
             self.children[2].evaluate(symbol_table)
+            writter("CALL binop_false\n")
 
 class For(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
         
-    def evaluate(self, symbol_table):
+#     def evaluate(self, symbol_table):
 
-        self.children[0].evaluate(symbol_table)
-        while self.children[1].evaluate(symbol_table)[1]:
+#         self.children[0].evaluate(symbol_table)
+#         while self.children[1].evaluate(symbol_table)[1]:
             
+#             self.children[3].evaluate(symbol_table)
+#             self.children[2].evaluate(symbol_table)
+
+    def evaluate(self, symbol_table):
+        self.children[0].evaluate(symbol_table)  
+        loop_label = f"loop_label{id(self)}"
+        end_loop = f"end_loop{id(self)}"
+        writter(f"{loop_label}:\n")
+
+        while self.children[1].evaluate(symbol_table)[1]:
+            writter("CALL binop_je\n")
+            writter(f"JMP {end_loop}\n")
             self.children[3].evaluate(symbol_table)
-            self.children[2].evaluate(symbol_table)
+            self.children[2].evaluate(symbol_table)  
+            writter(f"JMP {loop_label}\n")
+
+        writter(f"{end_loop}:\n")
+
 
 class Type(Node):
     def __init__(self, value, children):

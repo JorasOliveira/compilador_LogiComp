@@ -13,10 +13,8 @@ class Block(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        header()
         for child in self.children:
             child.evaluate(symbol_table)
-        footer()
 
 class Assignment(Node):
     def __init__(self, value, children):
@@ -45,11 +43,11 @@ class Assignment(Node):
                 if isinstance(node[1], int) or isinstance(node[1], float):
                     raise Exception("Syntax Error")
 
-            writter(f"MOV [EBP {ebp}], EAX; resultado da atribuição - não há return \n")    
+            writer(f"MOV [EBP {ebp}], EAX; resultado da atribuição - não há return \n")    
             symbol_table.set(self.children[0], node[0], node[1], ebp)
             
         # else:   
-        #     writter(f"MOV [EBP {ebp}], EAX; resultado da atribuição - não há return\n") 
+        #     writer(f"MOV [EBP {ebp}], EAX; resultado da atribuição - não há return\n") 
         #     symbol_table.set(self.children[0], self.value, self.children[1], ebp)
         
 class Identifier(Node):
@@ -59,7 +57,7 @@ class Identifier(Node):
     def evaluate(self, symbol_table):
         value = symbol_table.get(self.value)
 
-        writter("MOV [EBP -4], EAX; resultado da atribuição\n") #f"MOV EAX, {value[1]} ; Evaluate() do filho da direita\n" +
+        writer("MOV [EBP -4], EAX; resultado da atribuição\n") #f"MOV EAX, {value[1]} ; Evaluate() do filho da direita\n" +
         
         return value
 
@@ -71,22 +69,22 @@ class Print(Node):
         if isinstance(self.children[0], int):
             result = self.children[0]
             if result != None:
-                writter("MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
+                writer("MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
                         "PUSH EAX ; Empilha os argumentos para chamar a funcao\n" +
                         "PUSH formatout ; Dizendo para o printf que é um inteiro\n" +
                         "CALL printf ; Chamada da função\n" +
-                        "ADD ESP, 8 ; Remove os argumentos da pilha")
+                        "ADD ESP, 8 ; Remove os argumentos da pilha\n")
                 
                 print(result[1])
 
         else:
             result = self.children[0].evaluate(symbol_table)
             if result != None:
-                writter("MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
+                writer("MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
                         "PUSH EAX ; Empilha os argumentos para chamar a funcao\n" +
                         "PUSH formatout ; Dizendo para o printf que é um inteiro\n" +
                         "CALL printf ; Chamada da função\n" +
-                        "ADD ESP, 8 ; Remove os argumentos da pilha") 
+                        "ADD ESP, 8 ; Remove os argumentos da pilha\n") 
                    
                 print(result[1])
 
@@ -95,38 +93,61 @@ class If(Node):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-
+        print("evaluate do if")
         condition = self.children[0].evaluate(symbol_table)
-        writter("CMP EAX, False; Evaluate do If\n")
-        writter("JE end_if ; Jump pro final do if\n")
+        writer("CMP EAX, False; Evaluate do If\n")
+        writer("JE end_if ; Jump pro final do if\n")
 
-        if condition[1]:
+        if self.children[0].evaluate(symbol_table)[1]:
             self.children[1].evaluate(symbol_table)
-            writter("CALL binop_true\n")
-            writter("JMP end_if ; Jump pro final do if\n")
-            return
+            writer("CALL binop_true\n")
+            writer("JMP end_if ; Jump pro final do if\n")
             
-        writter("CALL binop_false\n")
-        writter("end_if: ; Fim do if\n")
+        writer("CALL binop_false\n")
+        writer("end_if: ; Fim do if\n")
 
 class Else(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
 
-
     def evaluate(self, symbol_table):
-        writter("CMP EAX, False; Evaluate do If\n")
-        writter("JE else ; Jump pro final do if\n") 
+        writer("CMP EAX, False; Evaluate do If\n")
+        writer("JE else ; Jump pro final do if\n") 
 
         if self.children[0].evaluate(symbol_table)[1]:
             self.children[1].evaluate(symbol_table)[1]
-            writter("CALL binop_true\n")
-            writter("JMP end_if_else ; Jump pro final do if\n")
+            writer("CALL binop_true\n")
+            writer("JMP end_if_else ; Jump pro final do if\n")
         else:
-            writter("else: ;\n")
+            writer("else: ;\n")
             self.children[2].evaluate(symbol_table)
-            writter("CALL binop_false\n")
-        writter("end_if_else: ; Fim do if\n")
+            writer("CALL binop_false\n")
+
+        writer("end_if_else: ; Fim do if\n")
+
+class For(Node):
+    def __init__(self, value, children):
+        super().__init__(value, children)
+        self.unique_id = id(self)
+    
+    def evaluate(self, symbol_table):
+        self.children[0].evaluate(symbol_table)
+       
+        # loop_label = f"LOOP_{self.unique_id}"
+        end_loop = f"EXIT_{self.unique_id}"
+        writer(f"LOOP_{self.unique_id}:\n")
+        
+        while self.children[1].evaluate(symbol_table)[1]:
+            writer("CALL binop_je\n")
+            writer(f"JMP {end_loop}\n")
+            self.children[3].evaluate(symbol_table)
+            self.children[2].evaluate(symbol_table)
+            # writer(f"JMP {loop_label}\n")
+            writer(f"JMP LOOP_{self.unique_id}:\n")
+
+        writer(f"{end_loop}:\n")
+
+
 # class For(Node):
 #     def __init__(self, value, children):
 #         super().__init__(value, children)
@@ -138,30 +159,6 @@ class Else(Node):
             
 #             self.children[3].evaluate(symbol_table)
 #             self.children[2].evaluate(symbol_table)
-
-class For(Node):
-    def __init__(self, value, children):
-        super().__init__(value, children)
-        self.unique_id = For.next_id
-        For.next_id += 1
-
-    next_id = 0
-    
-
-    def evaluate(self, symbol_table):
-        self.children[0].evaluate(symbol_table)
-        loop_label = f"LOOP_{self.unique_id}"
-        end_loop = f"EXIT_{self.unique_id}"
-        writter(f"{loop_label}:\n")
-
-        while self.children[1].evaluate(symbol_table)[1]:
-            writter("CALL binop_je\n")
-            writter(f"JMP {end_loop}\n")
-            self.children[3].evaluate(symbol_table)
-            self.children[2].evaluate(symbol_table)
-            writter(f"JMP {loop_label}\n")
-
-        writter(f"{end_loop}:\n")
 
 
 
@@ -181,7 +178,7 @@ class VarDec(Node):
         # if symbol_table.isIn(self.children[0].value):
         #     raise Exception("Syntax Error")
         
-        writter("PUSH DWORD 0 ; alocação na primeira atribuição\n")
+        writer("PUSH DWORD 0 ; alocação na primeira atribuição\n")
 
         if self.children[1] is not None:
             node = self.children[1].evaluate(symbol_table)
@@ -196,7 +193,7 @@ class VarDec(Node):
 
             ebp = symbol_table.get_ebp()   
 
-            writter(f"MOV [EBP {ebp}], EAX; resultado da atribuição - não há return\n") 
+            writer(f"MOV [EBP {ebp}], EAX; resultado da atribuição - não há return\n") 
             symbol_table.set(self.children[0].value, self.value, node[1], ebp - 4)
             
         else: 
@@ -208,7 +205,7 @@ class IntVal(Node):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
-        writter(f"MOV EAX, {self.value} ; Evaluate do IntVal\n")
+        writer(f"MOV EAX, {self.value} ; Evaluate do IntVal\n")
         return ("int", self.value)
     
 class StrVal(Node):
@@ -216,7 +213,7 @@ class StrVal(Node):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
-        writter("MOV EAX, " + str(self.value) + " ; Evaluate do StrVal\n")
+        writer("MOV EAX, " + str(self.value) + " ; Evaluate do StrVal\n")
         return ("string", self.value)
     
 class ScanLn(Node):
@@ -226,7 +223,7 @@ class ScanLn(Node):
     def evaluate(self, symbol_table):
         result = input()
 
-        writter("; Scanln\n" + 
+        writer("; Scanln\n" + 
                 "PUSH scanint ; endereço de memória de suporte\n" +
                 "PUSH formatin ; formato de entrada (int)\n" +
                 "call scanf\n" + 
@@ -243,7 +240,7 @@ class BinOp(Node):
     def evaluate(self, symbol_table):
         child_1 = self.children[1].evaluate(symbol_table)
 
-        writter("PUSH EAX ; O BinOp guarda o resultado na pilha\n")
+        writer("PUSH EAX ; O BinOp guarda o resultado na pilha\n")
 
         child_0 = self.children[0].evaluate(symbol_table)
 
@@ -255,61 +252,61 @@ class BinOp(Node):
 
             child_0 = tuple(child_0)
 
-        writter("POP EBX ; O BinOp recupera o valor da pilha em EAX\n")
+        writer("POP EBX ; O BinOp recupera o valor da pilha em EAX\n")
 
         if child_0[0] != child_1[0] and (self.value != "."):
             raise Exception("Syntax Error")
 
         if child_0 != None and child_1 != None:
             if self.value == "+":
-                writter("ADD EAX, EBX ;\n")
+                writer("ADD EAX, EBX ;\n")
                 return ("int", child_0[1] + child_1[1])
             if self.value == "-":
-                writter("SUB EAX, EBX ;\n")
+                writer("SUB EAX, EBX ;\n")
                 return ("int", child_0[1] - child_1[1])
             
             if self.value == "*":
-                writter("IMUL EBX ;\n")
+                writer("IMUL EBX ;\n")
                 return ("int", child_0[1] * child_1[1])
             if self.value == "/":
-                writter("IDIV EBX ;\n")
+                writer("IDIV EBX ;\n")
                 return ("int", child_0[1] // child_1[1])
             
             #because of go, we return 1 or 0 for booleans
             if self.value == '||':
-                writter("OR EAX, EBX ;\n")
+                writer("OR EAX, EBX ;\n")
                 if child_0[1] or child_1[1]:
                     return ("int", 1)
                 else: return ("int", 0)
 
             if self.value == "&&":
-                writter("AND EAX, EBX ;\n")
+                writer("AND EAX, EBX ;\n")
                 if child_0[1] and child_1[1]:
                     return ("int", 1)
                 else: return ("int", 0)
 
             if self.value == "==":
                 if (child_0[1] == child_1[1]):
-                    writter("CALL binop_je ;\n")
+                    writer("CALL binop_je ;\n")
                     return ("int", 1)
                 else: 
-                    writter("CALL binop_false ;\n")
+                    writer("CALL binop_false ;\n")
                     return ("int", 0) 
                 
             if self.value == ">":
                 if child_0[1] > child_1[1]:
-                    writter("CALL binop_jg ;\n")
+                    writer("CALL binop_jg ;\n")
                     return ("int", 1)
                 else: 
-                    writter("CALL binop_jl ;\n")
+                    writer("CALL binop_jl ;\n")
                     return ("int", 0)
                 
             if self.value == "<":
                 if child_0[1] < child_1[1]:
-                    writter("CALL binop_jl ;\n")
+                    writer("CALL binop_jl ;\n")
                     return ("int", 1)
                 else: 
-                    writter("CALL binop_jg ;\n")
+                    writer("CALL binop_jg ;\n")
                     return ("int", 0)
                 
             if self.value == ".":
@@ -337,22 +334,18 @@ class NoOp(Node):
         return None
 
 def header():
-    f = open("header.txt", "r")
-    h = f.read()
-    f.close()
-    f = open("teste1.asm", "w")
-    f.write(h)
-    f.close()
+    with open("header.txt", "r") as f:
+        h = f.read()
+    with open("teste1.asm", "w") as f:
+        f.write(h)
 
-def writter(code):
-    f = open("teste1.asm", "a")
-    f.write(code)
-    f.close()
+def writer(code):
+    with open("teste1.asm", "a") as f:
+        f.write(code)
 
 def footer():
-    f = open("footer.txt", "r")
-    h = f.read()
-    f.close()
-    f = open("teste1.asm", "a")
-    f.write(h)
-    f.close()
+    print("footer")
+    with open("footer.txt", "r") as f:
+        h = f.read()
+    with open("teste1.asm", "a") as f:
+        f.write(h)

@@ -234,8 +234,9 @@ class Parser:
     def run(code):
         tokenizer = Tokenizer.Tokenizer(code, 0)
         tokenizer.select_next()
+        Nodes.header()
         result = Parser.parse_program(tokenizer)
-
+        
         if tokenizer.open_parentheses_count != 0:
             raise Exception("incorrect number of parentheses")
 

@@ -97,28 +97,36 @@ class If(Node):
     def evaluate(self, symbol_table):
 
         condition = self.children[0].evaluate(symbol_table)
-        # writter("CMP EAX, False; Evaluate do If\n")
+        writter("CMP EAX, False; Evaluate do If\n")
+        writter("JE end_if ; Jump pro final do if\n")
 
         if condition[1]:
             self.children[1].evaluate(symbol_table)
             writter("CALL binop_true\n")
+            writter("JMP end_if ; Jump pro final do if\n")
             return
-            #writter("JMP end_if ; Jump pro final do if\n")
+            
         writter("CALL binop_false\n")
-        #writter("end_if: ; Fim do if\n")
+        writter("end_if: ; Fim do if\n")
 
 class Else(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
 
-    def evaluate(self, symbol_table): 
+
+    def evaluate(self, symbol_table):
+        writter("CMP EAX, False; Evaluate do If\n")
+        writter("JE else ; Jump pro final do if\n") 
+
         if self.children[0].evaluate(symbol_table)[1]:
             self.children[1].evaluate(symbol_table)[1]
             writter("CALL binop_true\n")
+            writter("JMP end_if_else ; Jump pro final do if\n")
         else:
+            writter("else: ;\n")
             self.children[2].evaluate(symbol_table)
             writter("CALL binop_false\n")
-
+        writter("end_if_else: ; Fim do if\n")
 # class For(Node):
 #     def __init__(self, value, children):
 #         super().__init__(value, children)
@@ -142,11 +150,8 @@ class For(Node):
 
     def evaluate(self, symbol_table):
         self.children[0].evaluate(symbol_table)
-        print("id0: ", self.unique_id)
-        loop_label = f"loop_{self.unique_id}"
-        print("id1: ", self.unique_id)
-        end_loop = f"END loop_{self.unique_id}"
-        print("id2: ", self.unique_id)
+        loop_label = f"LOOP_{self.unique_id}"
+        end_loop = f"EXIT_{self.unique_id}"
         writter(f"{loop_label}:\n")
 
         while self.children[1].evaluate(symbol_table)[1]:

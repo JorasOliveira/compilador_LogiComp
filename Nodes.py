@@ -124,28 +124,33 @@ class Else(Node):
             writer("CALL binop_false\n")
 
         writer("end_if_else: ; Fim do if\n")
-
 class For(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
         self.unique_id = id(self)
-    
+
     def evaluate(self, symbol_table):
-        self.children[0].evaluate(symbol_table)
-       
+        self.children[0].evaluate(symbol_table) 
+        
         # loop_label = f"LOOP_{self.unique_id}"
         end_loop = f"EXIT_{self.unique_id}"
-        writer(f"LOOP_{self.unique_id}:\n")
-        
-        while self.children[1].evaluate(symbol_table)[1]:
-            writer("CALL binop_je\n")
-            writer(f"JMP {end_loop}\n")
-            self.children[3].evaluate(symbol_table)
-            self.children[2].evaluate(symbol_table)
-            # writer(f"JMP {loop_label}\n")
-            writer(f"JMP LOOP_{self.unique_id}:\n")
+        writer(f"LOOP_{self.unique_id}:\n")  
 
-        writer(f"{end_loop}:\n")
+        while self.children[1].evaluate(symbol_table)[1]:  
+            writer("MOV EAX, 5\n") 
+            writer("PUSH EAX\n") 
+            writer("MOV [EBP - 4], EAX\n")  
+            writer("POP EBX\n")  
+            writer("CALL binop_jg\n") 
+
+            writer(f"JMP {end_loop}\n") 
+
+            self.children[3].evaluate(symbol_table)  
+            self.children[2].evaluate(symbol_table) 
+            
+            writer(f"JMP LOOP_{self.unique_id}:\n") 
+        writer(f"{end_loop}:\n")  
+
 
 
 # class For(Node):

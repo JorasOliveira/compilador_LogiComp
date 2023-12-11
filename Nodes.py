@@ -114,7 +114,7 @@ class Else(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
         self.unique_id = id(self)
-        
+
     def evaluate(self, symbol_table):
         writer("CMP EAX, False; Evaluate do If\n")
         writer(f"JE else_{str(self.unique_id)[0:4]} ; Jump pro final do if\n") 
@@ -194,7 +194,7 @@ class IntVal(Node):
 
     def evaluate(self, symbol_table):
         ebp = symbol_table.get_ebp() 
-        writer(f"MOV [EBP {ebp}], EAX; Evaluate do IntVal\n")
+        writer(f"MOV EAX, {self.value}; Evaluate do IntVal\n")
         return ("int", self.value)
     
 class StrVal(Node):

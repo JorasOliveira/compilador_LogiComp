@@ -88,33 +88,11 @@ class Print(Node):
                    
                 print(result[1])
 
-# class If(Node):
-#     def __init__(self, value, children):
-#         super().__init__(value, children)
-
-#     def evaluate(self, symbol_table):
-#         print("evaluate do if")
-#         condition = self.children[0].evaluate(symbol_table)
-#         writer("CMP EAX, False; Evaluate do If\n")
-        
-
-#         if self.children[0].evaluate(symbol_table)[1]:
-#             writer("JE end_if ; Jump pro final do if\n")
-#             self.children[1].evaluate(symbol_table)
-#             writer("CALL binop_true\n")
-            
-#         else: 
-#             writer("JMP end_if ; Jump pro final do if\n")
-
-#         writer("CALL binop_false\n")
-#         writer("end_if: ; Fim do if\n")
-
 class If(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
 
     def evaluate(self, symbol_table):
-        print("evaluate do if")
         condition = self.children[0].evaluate(symbol_table)
         writer("CMP EAX, False; Evaluate do If\n")
 
@@ -156,8 +134,7 @@ class For(Node):
     
     def evaluate(self, symbol_table):
         self.children[0].evaluate(symbol_table)
-       
-        # loop_label = f"LOOP_{self.unique_id}"
+
         end_loop = f"EXIT_{str(self.unique_id)[0:4]}"
         writer(f"LOOP_{str(self.unique_id)[0:4]}:\n")
         
@@ -166,25 +143,9 @@ class For(Node):
             writer(f"JMP {end_loop}\n")
             self.children[3].evaluate(symbol_table)
             self.children[2].evaluate(symbol_table)
-            # writer(f"JMP {loop_label}\n")
             writer(f"JMP LOOP_{str(self.unique_id)[0:4]}\n")
 
         writer(f"{end_loop}:\n")
-
-
-# class For(Node):
-#     def __init__(self, value, children):
-#         super().__init__(value, children)
-        
-#     def evaluate(self, symbol_table):
-
-#         self.children[0].evaluate(symbol_table)
-#         while self.children[1].evaluate(symbol_table)[1]:
-            
-#             self.children[3].evaluate(symbol_table)
-#             self.children[2].evaluate(symbol_table)
-
-
 
 class Type(Node):
     def __init__(self, value, children):
@@ -310,27 +271,27 @@ class BinOp(Node):
                 else: return ("int", 0)
 
             if self.value == "==":
+                writer("CMP EAX, EBX\n" +
+                       "CALL binop_jg\n")
                 if (child_0[1] == child_1[1]):
-                    writer("CALL binop_je ;\n")
                     return ("int", 1)
                 else: 
-                    writer("CALL binop_false ;\n")
                     return ("int", 0) 
                 
             if self.value == ">":
+                writer("CMP EAX, EBX\n"+
+                       "CALL binop_jg\n")
                 if child_0[1] > child_1[1]:
-                    writer("CALL binop_jg ;\n")
                     return ("int", 1)
                 else: 
-                    writer("CALL binop_jl ;\n")
                     return ("int", 0)
                 
             if self.value == "<":
+                writer("CMP EAX, EBX\n" +
+                       "CALL binop_jg\n")
                 if child_0[1] < child_1[1]:
-                    writer("CALL binop_jl ;\n")
                     return ("int", 1)
                 else: 
-                    writer("CALL binop_jg ;\n")
                     return ("int", 0)
                 
             if self.value == ".":
@@ -342,12 +303,15 @@ class UnOp(Node):
 
     def evaluate(self, symbol_table):
         if self.value == "+":
+            writer(f"MOV EAX, {self.children[0].evaluate(symbol_table)[1]}\n")
             return ("int", self.children[0].evaluate(symbol_table)[1])
 
         if self.value == "-":
-            return ("int", -self.children[0].evaluate(symbol_table)[1])
+            writer("NEG EAX\n")
+            return ("int", - self.children[0].evaluate(symbol_table)[1])
         
         if self.value == "!":
+            writer(f"MOV EAX, {not self.children[0]}\n")
             return ("int",  not self.children[0])
 
 class NoOp(Node):
@@ -368,7 +332,6 @@ def writer(code):
         f.write(code)
 
 def footer():
-    print("footer")
     with open("footer.txt", "r") as f:
         h = f.read()
     with open("teste1.asm", "a") as f:

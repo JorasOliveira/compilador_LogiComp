@@ -88,6 +88,27 @@ class Print(Node):
                    
                 print(result[1])
 
+# class If(Node):
+#     def __init__(self, value, children):
+#         super().__init__(value, children)
+
+#     def evaluate(self, symbol_table):
+#         print("evaluate do if")
+#         condition = self.children[0].evaluate(symbol_table)
+#         writer("CMP EAX, False; Evaluate do If\n")
+        
+
+#         if self.children[0].evaluate(symbol_table)[1]:
+#             writer("JE end_if ; Jump pro final do if\n")
+#             self.children[1].evaluate(symbol_table)
+#             writer("CALL binop_true\n")
+            
+#         else: 
+#             writer("JMP end_if ; Jump pro final do if\n")
+
+#         writer("CALL binop_false\n")
+#         writer("end_if: ; Fim do if\n")
+
 class If(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
@@ -96,18 +117,18 @@ class If(Node):
         print("evaluate do if")
         condition = self.children[0].evaluate(symbol_table)
         writer("CMP EAX, False; Evaluate do If\n")
-        
 
-        if self.children[0].evaluate(symbol_table)[1]:
+        if not condition:
+            writer("JMP end_if ; Jump pro final do if\n")
+
+        else:
             writer("JE end_if ; Jump pro final do if\n")
             self.children[1].evaluate(symbol_table)
             writer("CALL binop_true\n")
-            
-        else: 
-            writer("JMP end_if ; Jump pro final do if\n")
 
         writer("CALL binop_false\n")
         writer("end_if: ; Fim do if\n")
+
 
 class Else(Node):
     def __init__(self, value, children):
@@ -146,7 +167,7 @@ class For(Node):
             self.children[3].evaluate(symbol_table)
             self.children[2].evaluate(symbol_table)
             # writer(f"JMP {loop_label}\n")
-            writer(f"JMP LOOP_{str(self.unique_id)[0:4]}:\n")
+            writer(f"JMP LOOP_{str(self.unique_id)[0:4]}\n")
 
         writer(f"{end_loop}:\n")
 

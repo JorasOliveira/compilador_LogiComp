@@ -56,8 +56,8 @@ class Identifier(Node):
 
     def evaluate(self, symbol_table):
         value = symbol_table.get(self.value)
-
-        writer("MOV [EBP -4], EAX; resultado da atribuição\n") #f"MOV EAX, {value[1]} ; Evaluate() do filho da direita\n" +
+        ebp = symbol_table.get_ebp() 
+        writer(f"MOV [EBP -{ebp}], EAX; resultado da atribuição\n") #f"MOV EAX, {value[1]} ; Evaluate() do filho da direita\n" +
         
         return value
 
@@ -190,7 +190,8 @@ class IntVal(Node):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
-        writer(f"MOV EAX, {self.value} ; Evaluate do IntVal\n")
+        ebp = symbol_table.get_ebp() 
+        writer(f"MOV[EBP - {ebp}], EAX; Evaluate do IntVal\n")
         return ("int", self.value)
     
 class StrVal(Node):
@@ -211,7 +212,7 @@ class ScanLn(Node):
         writer("; Scanln\n" + 
                 "PUSH scanint ; endereço de memória de suporte\n" +
                 "PUSH formatin ; formato de entrada (int)\n" +
-                "call scanf\n" + 
+                "CALL scanf\n" + 
                 "ADD ESP, 8 ; Remove os argumentos da pilha\n" + 
                 "MOV EAX, DWORD [scanint] ; retorna o valor lido em EAX\n" +
                 "MOV [EBP-4], EAX; resultado da atribuição\n")

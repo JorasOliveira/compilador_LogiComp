@@ -192,7 +192,7 @@ class IntVal(Node):
 
     def evaluate(self, symbol_table):
         ebp = symbol_table.get_ebp() 
-        writer(f"MOV[EBP {ebp}], EAX; Evaluate do IntVal\n")
+        writer(f"MOV [EBP {ebp}], EAX; Evaluate do IntVal\n")
         return ("int", self.value)
     
 class StrVal(Node):

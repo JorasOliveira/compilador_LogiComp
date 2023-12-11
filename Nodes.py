@@ -69,7 +69,7 @@ class Print(Node):
         if isinstance(self.children[0], int):
             result = self.children[0]
             if result != None:
-                writer("MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
+                writer( #"MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
                         "PUSH EAX ; Empilha os argumentos para chamar a funcao\n" +
                         "PUSH formatout ; Dizendo para o printf que é um inteiro\n" +
                         "CALL printf ; Chamada da função\n" +
@@ -80,7 +80,7 @@ class Print(Node):
         else:
             result = self.children[0].evaluate(symbol_table)
             if result != None:
-                writer("MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
+                writer(#"MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
                         "PUSH EAX ; Empilha os argumentos para chamar a funcao\n" +
                         "PUSH formatout ; Dizendo para o printf que é um inteiro\n" +
                         "CALL printf ; Chamada da função\n" +
@@ -249,7 +249,6 @@ class BinOp(Node):
             if self.value == "-":
                 writer("SUB EAX, EBX ;\n")
                 return ("int", child_0[1] - child_1[1])
-            
             if self.value == "*":
                 writer("IMUL EBX ;\n")
                 return ("int", child_0[1] * child_1[1])

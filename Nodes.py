@@ -92,41 +92,43 @@ class Print(Node):
 class If(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
+        self.unique_id = id(self)
 
     def evaluate(self, symbol_table):
         condition = self.children[0].evaluate(symbol_table)
         writer("CMP EAX, False; Evaluate do If\n")
 
         if not condition:
-            writer("JMP end_if ; Jump pro final do if\n")
+            writer(f"JMP end_if{str(self.unique_id)[0:4]} ; Jump pro final do if\n")
 
         else:
-            writer("JE end_if ; Jump pro final do if\n")
+            writer(f"JE end_if{str(self.unique_id)[0:4]} ; Jump pro final do if\n")
             self.children[1].evaluate(symbol_table)
             writer("CALL binop_true\n")
 
         writer("CALL binop_false\n")
-        writer("end_if: ; Fim do if\n")
+        writer(f"end_if{str(self.unique_id)[0:4]}: ; Fim do if\n")
 
 
 class Else(Node):
     def __init__(self, value, children):
         super().__init__(value, children)
-
+        self.unique_id = id(self)
+        
     def evaluate(self, symbol_table):
         writer("CMP EAX, False; Evaluate do If\n")
-        writer("JE else ; Jump pro final do if\n") 
+        writer(f"JE else_{str(self.unique_id)[0:4]} ; Jump pro final do if\n") 
 
         if self.children[0].evaluate(symbol_table)[1]:
             self.children[1].evaluate(symbol_table)[1]
             writer("CALL binop_true\n")
-            writer("JMP end_if_else ; Jump pro final do if\n")
+            writer(f"JMP end_if_else{str(self.unique_id)[0:4]} ; Jump pro final do if\n")
         else:
-            writer("else: ;\n")
+            writer(f"else_{str(self.unique_id)[0:4]}: ;\n")
             self.children[2].evaluate(symbol_table)
             writer("CALL binop_false\n")
 
-        writer("end_if_else: ; Fim do if\n")
+        writer(f"end_if_else{str(self.unique_id)[0:4]}: ; Fim do if\n")
 
 class For(Node):
     def __init__(self, value, children):

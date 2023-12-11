@@ -58,7 +58,7 @@ class Identifier(Node):
         value = symbol_table.get(self.value)
         ebp = symbol_table.get_ebp() 
         # print(ebp)
-        writer(f"MOV [EBP {ebp}], EAX; resultado da atribuição\n") #f"MOV EAX, {value[1]} ; Evaluate() do filho da direita\n" +
+        writer(f"MOV EAX, [EBP {ebp}]; resultado da atribuição\n") #f"MOV EAX, {value[1]} ; Evaluate() do filho da direita\n" +
         
         return value
 

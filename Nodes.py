@@ -272,7 +272,7 @@ class BinOp(Node):
 
             if self.value == "==":
                 writer("CMP EAX, EBX\n" +
-                       "CALL binop_jg\n")
+                       "CALL binop_je\n")
                 if (child_0[1] == child_1[1]):
                     return ("int", 1)
                 else: 
@@ -288,7 +288,7 @@ class BinOp(Node):
                 
             if self.value == "<":
                 writer("CMP EAX, EBX\n" +
-                       "CALL binop_jg\n")
+                       "CALL binop_jl\n")
                 if child_0[1] < child_1[1]:
                     return ("int", 1)
                 else: 

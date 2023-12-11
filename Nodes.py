@@ -143,7 +143,6 @@ class For(Node):
         
         while self.children[1].evaluate(symbol_table)[1]:
             # writer("CALL binop_je\n")
-            # self.children[1].evaluate(symbol_table)[1]
             writer(f"JMP {end_loop}\n")
             self.children[3].evaluate(symbol_table)
             self.children[2].evaluate(symbol_table)

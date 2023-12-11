@@ -22,8 +22,7 @@ class Assignment(Node):
 
     def evaluate(self, symbol_table):
                        
-        ebp = symbol_table.get_ebp() 
-        ebp = ebp - 4  
+        ebp = symbol_table.get_ebp(self.children[0]) 
         if self.children[1] is not None:
             node = self.children[1].evaluate(symbol_table)
 
@@ -56,8 +55,7 @@ class Identifier(Node):
 
     def evaluate(self, symbol_table):
         value = symbol_table.get(self.value)
-        ebp = symbol_table.get_ebp() 
-        # print(ebp)
+        ebp = symbol_table.get_ebp(self.value) 
         writer(f"MOV EAX, [EBP {ebp}]; resultado da atribuição\n") #f"MOV EAX, {value[1]} ; Evaluate() do filho da direita\n" +
         
         return value
@@ -70,7 +68,7 @@ class Print(Node):
         if isinstance(self.children[0], int):
             result = self.children[0]
             if result != None:
-                writer( #"MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
+                writer( "MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
                         "PUSH EAX ; Empilha os argumentos para chamar a funcao\n" +
                         "PUSH formatout ; Dizendo para o printf que é um inteiro\n" +
                         "CALL printf ; Chamada da função\n" +
@@ -81,7 +79,7 @@ class Print(Node):
         else:
             result = self.children[0].evaluate(symbol_table)
             if result != None:
-                writer(#"MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
+                writer("MOV EAX, [EBP -4] ; Evaluate do Identifier, único filho do print\n" +
                         "PUSH EAX ; Empilha os argumentos para chamar a funcao\n" +
                         "PUSH formatout ; Dizendo para o printf que é um inteiro\n" +
                         "CALL printf ; Chamada da função\n" +
@@ -179,21 +177,23 @@ class VarDec(Node):
                 if isinstance(node[1], int) or isinstance(node[1], float):
                     raise Exception("Syntax Error")
 
-            ebp = symbol_table.get_ebp()   
+            # ebp = symbol_table.get_ebp(self.children[0].value)   
+            ebp = symbol_table.get_len() * -4
+            # print("ebp: ", ebp)
 
             writer(f"MOV [EBP {ebp}], EAX; resultado da atribuição - não há return\n") 
             symbol_table.set(self.children[0].value, self.value, node[1], ebp - 4)
             
         else: 
-            ebp = symbol_table.get_ebp()
-            symbol_table.set(self.children[0].value, self.value.value, self.children[0].value, ebp)
+            # ebp = symbol_table.get_ebp(self.children[0].value) 
+            ebp = symbol_table.get_len() * -4
+            symbol_table.set(self.children[0].value, self.value.value, self.children[0].value, ebp -4)
 
 class IntVal(Node):
     def __init__(self, value):
         super().__init__(value, [])
 
     def evaluate(self, symbol_table):
-        ebp = symbol_table.get_ebp() 
         writer(f"MOV EAX, {self.value}; Evaluate do IntVal\n")
         return ("int", self.value)
     
@@ -333,7 +333,8 @@ def header():
 def writer(code):
     with open("teste1.asm", "a") as f:
         f.write(code)
-
+    with open("teste1.asm", "a") as f:
+        f.write("\n")
 def footer():
     with open("footer.txt", "r") as f:
         h = f.read()

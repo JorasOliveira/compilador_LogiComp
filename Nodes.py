@@ -141,13 +141,13 @@ class For(Node):
         end_loop = f"EXIT_{str(self.unique_id)[0:4]}"
         writer(f"LOOP_{str(self.unique_id)[0:4]}:\n")
         
-        #while self.children[1].evaluate(symbol_table)[1]:
+        while self.children[1].evaluate(symbol_table)[1]:
             # writer("CALL binop_je\n")
-        self.children[1].evaluate(symbol_table)[1]
-        writer(f"JMP {end_loop}\n")
-        self.children[3].evaluate(symbol_table)
-        self.children[2].evaluate(symbol_table)
-        writer(f"JMP LOOP_{str(self.unique_id)[0:4]}\n")
+            # self.children[1].evaluate(symbol_table)[1]
+            writer(f"JMP {end_loop}\n")
+            self.children[3].evaluate(symbol_table)
+            self.children[2].evaluate(symbol_table)
+            writer(f"JMP LOOP_{str(self.unique_id)[0:4]}\n")
 
         writer(f"{end_loop}:\n")
 

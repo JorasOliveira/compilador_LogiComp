@@ -99,11 +99,13 @@ class If(Node):
         
 
         if self.children[0].evaluate(symbol_table)[1]:
-            writer("JMP end_if ; Jump pro final do if\n")
+            writer("JE end_if ; Jump pro final do if\n")
             self.children[1].evaluate(symbol_table)
             writer("CALL binop_true\n")
             
-            
+        else: 
+            writer("JMP end_if ; Jump pro final do if\n")
+
         writer("CALL binop_false\n")
         writer("end_if: ; Fim do if\n")
 

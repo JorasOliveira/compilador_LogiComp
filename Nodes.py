@@ -96,13 +96,10 @@ class If(Node):
         condition = self.children[0].evaluate(symbol_table)
         writer("CMP EAX, False; Evaluate do If\n")
 
-        if not condition:
-            writer(f"JMP end_if{str(self.unique_id)[0:4]} ; Jump pro final do if\n")
-
-        else:
-            writer(f"JE end_if{str(self.unique_id)[0:4]} ; Jump pro final do if\n")
+        if condition[1]:
             self.children[1].evaluate(symbol_table)
             writer("CALL binop_true\n")
+            writer(f"JE end_if{str(self.unique_id)[0:4]} ; Jump pro final do if\n")
 
         writer("CALL binop_false\n")
         writer(f"end_if{str(self.unique_id)[0:4]}: ; Fim do if\n")
@@ -137,16 +134,22 @@ class For(Node):
         self.children[0].evaluate(symbol_table)
 
         end_loop = f"EXIT_{str(self.unique_id)[0:4]}"
+
         writer(f"LOOP_{str(self.unique_id)[0:4]}:\n")
         
-        while self.children[1].evaluate(symbol_table)[1]:
+        # while self.children[1].evaluate(symbol_table)[1]:
+        
+            # writer("CMP EAX, False\n")
             # writer("CALL binop_je\n")
-            writer(f"JMP {end_loop}\n")
-            self.children[3].evaluate(symbol_table)
-            self.children[2].evaluate(symbol_table)
-            writer(f"JMP LOOP_{str(self.unique_id)[0:4]}\n")
+            # writer(f"JMP {end_loop}\n")
+        self.children[1].evaluate(symbol_table)[1]
+        writer(f'CMP EAX, False\nJE EXIT_LOOP_{str(self.unique_id)[0:4]}\n')
+        self.children[3].evaluate(symbol_table)
+        self.children[2].evaluate(symbol_table)
+        # writer(f"JMP LOOP_{str(self.unique_id)[0:4]}\n")
+        writer(f'JMP LOOP_{str(self.unique_id)[0:4]}\nEXIT_LOOP_{str(self.unique_id)[0:4]}:\n')
 
-        writer(f"{end_loop}:\n")
+        # writer(f"{end_loop}:\n")
 
 class Type(Node):
     def __init__(self, value, children):
